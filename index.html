@@ -3,99 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมฝึกอ่านภาษาไทย</title>
+    <title>โปรแกรมฝึกอ่านภาษาไทย - สถิติรายบุคคล</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4FD1C5; --secondary: #ED8936; --success: #38A169; --danger: #E53E3E; }
+        :root { --primary: #4FD1C5; --secondary: #ED8936; --success: #38A169; --danger: #E53E3E; --dark: #2D3748; }
         body { font-family: 'Sarabun', sans-serif; background-color: #F4F9F9; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
         .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; }
-        .level-info { color: #718096; font-size: 0.9rem; margin-bottom: 10px; }
-        h1 { font-size: 80px; color: #2D3748; margin: 10px 0; }
-        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .btn { border: none; padding: 12px 24px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; }
-        .btn-listen { background-color: var(--primary); }
-        .btn-speak { background-color: var(--secondary); }
+        
+        /* สไตล์หน้าเข้าสู่ระบบ */
+        #loginScreen { display: block; }
+        #practiceScreen { display: none; }
+        
+        input[type="text"] { width: 80%; padding: 12px; margin: 15px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 18px; text-align: center; }
+        
+        .level-info { color: #718096; font-size: 0.9rem; margin-bottom: 10px; background: #EDF2F7; padding: 5px 15px; border-radius: 50px; display: inline-block; }
+        h1 { font-size: 70px; color: var(--dark); margin: 10px 0; }
+        
+        .btn { border: none; padding: 14px 28px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; width: 100%; margin-bottom: 10px; }
+        .btn-start { background-color: var(--primary); }
+        .btn-speak { background-color: var(--secondary); box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4); }
         .btn-report { background-color: #4A5568; margin-top: 20px; }
-        #resultText { height: 50px; margin: 15px 0; font-weight: bold; }
-        .report-panel { display: none; margin-top: 20px; text-align: left; background: #EDF2F7; padding: 15px; border-radius: 12px; font-size: 14px; }
+        
+        #resultText { height: 60px; margin: 15px 0; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+        
+        .report-panel { display: none; margin-top: 20px; text-align: left; background: #EDF2F7; padding: 20px; border-radius: 12px; font-size: 14px; max-height: 200px; overflow-y: auto; }
+        .student-name-display { font-weight: bold; color: var(--primary); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="level-info" id="levelDisplay">ระดับ: สระ ะ</div>
-    <p>คำที่ <span id="wordNumber">1</span></p>
+<!-- หน้าเข้าสู่ระบบ (กรอกชื่อ) -->
+<div id="loginScreen" p="loginScreen class="card">
+    <h2>สวัสดีครับ/ค่ะ</h2>
+    <p>กรุณาพิมพ์ชื่อผู้ใช้งานเพื่อเริ่มบันทึกผล</p>
+    <input type="text" id="studentNameInput" placeholder="พิมพ์ชื่อของคุณที่นี่...">
+    <input type="text" p="studentRoomInput" placeholder="พิมพ์ชั้นของคุณที่นี่...">
+    <button class="btn btn-start" onclick="startApp()">เข้าสู่บทเรียน</button>
+</div>
+
+<!-- หน้าฝึกอ่าน -->
+<div id="practiceScreen" class="card">
+    <div class="student-name-display">ผู้อ่าน: <span id="displayName"></span></div>
+    <div class="student-room-display">ชั้น: <span p="displayRoom"></span></div>
+    <div id="levelDisplay" class="level-info">สระ ะ</div>
+    <p>คำที่ <span id="wordNumber">1</span> จากทั้งหมด</p>
     <h1 id="wordDisplay">กะ</h1>
 
-    <div id="resultText">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
+    <div id="resultText">กดปุ่มสีส้มแล้วพูดตามคำข้างบน</div>
 
-    <div class="btn-group">
-        <button class="btn btn-speak" onclick="startListening()">🎤 ฝึกอ่านออกเสียง</button>
-    </div>
-
-    <button class="btn btn-report" onclick="toggleReport()">📊 ดูรายงานผล</button>
+    <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่านออกเสียง</button>
+    <button class="btn btn-report" onclick="toggleReport()">📊 ดูสถิติของฉัน</button>
     
     <div id="reportPanel" class="report-panel">
-        <strong>สถิติการใช้งาน:</strong>
-        <div id="statsContent">ยังไม่มีข้อมูล</div>
+        <strong>สถิติการอ่านรายคน:</strong>
+        <div id="statsContent">กำลังโหลด...</div>
         <hr>
-        <button onclick="clearStats()" style="font-size: 10px;">ล้างข้อมูลใหม่ทั้งหมด</button>
+        <button onclick="logout()" style="border:none; background:none; color:red; cursor:pointer; font-size:12px;">ออกจากระบบ (เปลี่ยนคนอ่าน)</button>
     </div>
 </div>
 
 <script>
-    // 1. รายการคำ (เนื้อหาตามที่คุณต้องการ)
+    // URL สำหรับเชื่อม Google Sheets (ใส่ URL ของคุณที่ได้จาก Apps Script)
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwUwSuiJZz3f9G3pQ_Zl9gXsUFOF8SvYvoyrhFNLHDAfbZJW91lnh_-4ZT3PuKKVc6GeA/exec";
+
+    // รายการคำที่จัดเรียงตามเงื่อนไข (ะ -> า -> ผสม -> ิ -> ผสม -> ตัวสะกด)
     const wordList = [
-        // สระ ะ (พยัญชนะเดี่ยว, ควบ, นำ)
         { word: "กะ", level: "สระ ะ (พยัญชนะเดี่ยว)" },
-        { word: "จะ", level: "สระ ะ (พยัญชนะเดี่ยว)" },
+        { word: "ชะ", level: "สระ ะ (พยัญชนะเดี่ยว)" },
         { word: "กระ", level: "สระ ะ (อักษรควบ)" },
-        { word: "พระ", level: "สระ ะ (อักษรควบ)" },
         { word: "ขะ", level: "สระ ะ (อักษรนำ)" },
-        // สระ า
         { word: "กา", level: "สระ า" },
-        { word: "ตา", level: "สระ า" },
-        { word: "ปลา", level: "สระ า (ควบกล้ำ)" },
-        // คำ 2 คำติดกัน (ะ และ า)
-        { word: "กะลา", level: "ประผสม ะ และ า" },
-        { word: "มะระ", level: "ประผสม ะ และ า" },
-        // สระ ิ
-        { word: "กิติ", level: "สระ ิ" },
-        { word: "มะลิ", level: "ประสม ะ และ ิ" },
-        // 3 คำติดกัน
-        { word: "บิดามาระ", level: "ประสม ะ า ิ" },
-        { word: "กะทิสด", level: "คำที่มีตัวสะกด" }
+        { word: "มา", level: "สระ า" },
+        { word: "ปลา", level: "สระ า (อักษรควบ)" },
+        { word: "กะลา", level: "ผสม ะ และ า (2 คำ)" },
+        { word: "มะระ", level: "ผสม ะ และ า (2 คำ)" },
+        { word: "ปิติ", level: "สระ ิ" },
+        { word: "มะลิ", level: "ผสม ะ และ ิ (2 คำ)" },
+        { word: "บิดา", level: "ผสม ิ และ า (2 คำ)" },
+        { word: "กะทิสด", level: "ผสม ะ ิ และตัวสะกด" },
+        { word: "นกกระจิบ", level: "คำที่มีตัวสะกด" },
+        { word: "กินข้าว", level: "คำที่มีตัวสะกด" }
     ];
 
+    let currentStudent = "";
     let currentIndex = 0;
     let attempts = 0;
-    let stats = JSON.parse(localStorage.getItem('readingStats')) || { totalRead: 0, success: 0 };
 
-    // ใส่ URL ของ Google Apps Script ที่คุณได้จาก "ส่วนที่ 1" ตรงนี้
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwzwcp_zA2jsyzFwdGuWghV-naxXQ_xbuKhNWY1V5Naw8uodypLjE3CdvRQuUIXLyU9EA/exec"; 
+    function startApp() {
+        const nameInput = document.getElementById("studentNameInput").value;
+        if (nameInput.trim() === "") {
+            alert("กรุณาใส่ชื่อก่อนเริ่มนะครับ");
+            return;
+        }
+        currentStudent = nameInput;
+        document.getElementById("displayName").innerText = currentStudent;
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("practiceScreen").style.display = "block";
+        updateDisplay();
+    }
 
     function updateDisplay() {
         const current = wordList[currentIndex];
         document.getElementById("wordDisplay").innerText = current.word;
         document.getElementById("wordNumber").innerText = currentIndex + 1;
         document.getElementById("levelDisplay").innerText = "ระดับ: " + current.level;
-        document.getElementById("resultText").innerText = "พร้อมสำหรับคำใหม่...";
+        document.getElementById("resultText").innerText = "กดปุ่มไมค์เพื่ออ่านคำว่า " + current.word;
         document.getElementById("resultText").style.color = "#718096";
         attempts = 0;
     }
 
-    function playAudio() {
-        const utterance = new SpeechSynthesisUtterance(wordList[currentIndex].word);
-        utterance.lang = "th-TH";
-        window.speechSynthesis.speak(utterance);
-    }
-
     function startListening() {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("เบราว์เซอร์นี้ไม่รองรับระบบเสียง แนะนำให้ใช้ Chrome บนมือถือหรือคอมพิวเตอร์ครับ");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
         recognition.lang = "th-TH";
         const resultElement = document.getElementById("resultText");
         
-        resultElement.innerText = "กำลังฟัง...";
+        resultElement.innerText = "正在听... กำลังฟัง...";
+        resultElement.style.color = "#D69E2E";
         attempts++;
 
         recognition.start();
@@ -105,64 +134,73 @@
             const targetWord = wordList[currentIndex].word;
 
             if (spokenText.includes(targetWord)) {
-                resultElement.innerText = "🎉 เก่งมาก! อ่านถูกต้อง";
+                resultElement.innerText = "🎉 ถูกต้อง! เก่งมากครับ";
                 resultElement.style.color = "#38A169";
-                saveStats(targetWord, "ผ่าน", attempts);
+                saveStatsToSheet(targetWord, wordList[currentIndex].level, "ผ่าน", attempts);
                 
                 setTimeout(() => {
                     if (currentIndex < wordList.length - 1) {
                         currentIndex++;
                         updateDisplay();
                     } else {
-                        alert("ยินดีด้วย! คุณเรียนจบทุกบทเรียนแล้ว");
-                        currentIndex = 0;
-                        updateDisplay();
+                        resultElement.innerText = "🎊 เยี่ยมมาก! คุณเรียนจบทุกบทเรียนแล้ว";
+                        setTimeout(() => { logout(); }, 5000);
                     }
                 }, 2000);
             } else {
-                resultElement.innerText = `คุณอ่านว่า "${spokenText}" ลองใหม่อีกครั้งนะ`;
+                resultElement.innerText = `คุณอ่านว่า "${spokenText}" (ลองอีกครั้งนะ)`;
                 resultElement.style.color = "#E53E3E";
             }
         };
     }
 
-    function saveStats(word, status, count) {
-        stats.totalRead++;
-        if(status === "ผ่าน") stats.success++;
-        localStorage.setItem('readingStats', JSON.stringify(stats));
-        updateStatsDisplay();
+    function saveStatsToSheet(word, level, status, count) {
+        // บันทึกลง LocalStorage สำหรับดูรายงานหน้าเว็บ
+        let localData = JSON.parse(localStorage.getItem('readingData_' + currentStudent)) || [];
+        localData.push({ word, level, status, count, time: new Date().toLocaleString() });
+        localStorage.setItem('readingData_' + currentStudent, JSON.stringify(localData));
 
-        // ส่งข้อมูลไป Google Sheets
-        if(GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbwzwcp_zA2jsyzFwdGuWghV-naxXQ_xbuKhNWY1V5Naw8uodypLjE3CdvRQuUIXLyU9EA/exec") {
+        // ส่งไปยัง Google Sheets
+        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbwUwSuiJZz3f9G3pQ_Zl9gXsUFOF8SvYvoyrhFNLHDAfbZJW91lnh_-4ZT3PuKKVc6GeA/exec") {
             fetch(GOOGLE_SHEET_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ word: word, status: status, attempts: count })
+                cache: 'no-cache',
+                body: JSON.stringify({
+                    student: currentStudent,
+                    word: word,
+                    level: level,
+                    status: status,
+                    attempts: count
+                })
             });
         }
     }
 
-    function updateStatsDisplay() {
-        document.getElementById("statsContent").innerHTML = `
-            อ่านไปแล้ว: ${stats.totalRead} ครั้ง<br>
-            สำเร็จ: ${stats.success} คำ<br>
-            อัตราความสำเร็จ: ${Math.round((stats.success/stats.totalRead)*100) || 0}%
-        `;
-    }
-
     function toggleReport() {
         const panel = document.getElementById("reportPanel");
-        panel.style.display = panel.style.display === "none" ? "block" : "none";
-        updateStatsDisplay();
+        const statsContent = document.getElementById("statsContent");
+        
+        if (panel.style.display === "none" || panel.style.display === "") {
+            panel.style.display = "block";
+            let localData = JSON.parse(localStorage.getItem('readingData_' + currentStudent)) || [];
+            if (localData.length === 0) {
+                statsContent.innerHTML = "ยังไม่มีข้อมูลการอ่าน";
+            } else {
+                statsContent.innerHTML = localData.map(item => 
+                    `• ${item.word} (${item.count} ครั้ง) - <small>${item.time}</small>`
+                ).join('<br>');
+            }
+        } else {
+            panel.style.display = "none";
+        }
     }
 
-    function clearStats() {
-        localStorage.removeItem('readingStats');
-        stats = { totalRead: 0, success: 0 };
-        updateStatsDisplay();
+    function logout() {
+        if(confirm("ต้องการเปลี่ยนผู้ใช้งานหรือเริ่มต้นใหม่ใช่หรือไม่?")) {
+            location.reload();
+        }
     }
-
-    updateDisplay();
 </script>
 
 </body>
