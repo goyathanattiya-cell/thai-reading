@@ -72,7 +72,7 @@
     let stats = JSON.parse(localStorage.getItem('readingStats')) || { totalRead: 0, success: 0 };
 
     // ใส่ URL ของ Google Apps Script ที่คุณได้จาก "ส่วนที่ 1" ตรงนี้
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzfIE_CP0w6VfRQMJRtXSMajFhmiHjVIcjfhKNcCOJJ0Sa-CaPyGgO0W6fSouROxSWPaA/exec"; 
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwzwcp_zA2jsyzFwdGuWghV-naxXQ_xbuKhNWY1V5Naw8uodypLjE3CdvRQuUIXLyU9EA/exec"; 
 
     function updateDisplay() {
         const current = wordList[currentIndex];
@@ -133,7 +133,7 @@
         updateStatsDisplay();
 
         // ส่งข้อมูลไป Google Sheets
-        if(GOOGLE_SHEET_URL !== "ใส่_URL_ที่นี่") {
+        if(GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbwzwcp_zA2jsyzFwdGuWghV-naxXQ_xbuKhNWY1V5Naw8uodypLjE3CdvRQuUIXLyU9EA/exec") {
             fetch(GOOGLE_SHEET_URL, {
                 method: 'POST',
                 mode: 'no-cors',
