@@ -3,203 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมฝึกอ่านภาษาไทย - สถิติรายบุคคล</title>
+    <title>โปรแกรมฝึกอ่านประเมินระดับ R1-R8</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4FD1C5; --secondary: #ED8936; --success: #38A169; --danger: #E53E3E; --dark: #2D3748; }
         body { font-family: 'Sarabun', sans-serif; background-color: #F4F9F9; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; }
+        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 550px; width: 100%; text-align: center; }
         
-        /* สไตล์หน้าเข้าสู่ระบบ */
         #loginScreen { display: block; }
         #practiceScreen { display: none; }
         
-        input[type="text"] { width: 80%; padding: 12px; margin: 15px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 18px; text-align: center; }
+        input[type="text"] { width: 85%; padding: 12px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 18px; text-align: center; }
         
-        .level-info { color: #718096; font-size: 0.9rem; margin-bottom: 10px; background: #EDF2F7; padding: 5px 15px; border-radius: 50px; display: inline-block; }
-        h1 { font-size: 70px; color: var(--dark); margin: 10px 0; }
+        .badge { display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
+        .badge-r { background: #E9D8FD; color: #6B46C1; }
         
-        .btn { border: none; padding: 14px 28px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; width: 100%; margin-bottom: 10px; }
+        h1 { font-size: 80px; color: var(--dark); margin: 15px 0; }
+        .btn { border: none; padding: 15px 28px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; width: 100%; margin-bottom: 10px; }
         .btn-start { background-color: var(--primary); }
         .btn-speak { background-color: var(--secondary); box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4); }
-        .btn-report { background-color: #4A5568; margin-top: 20px; }
         
-        #resultText { height: 60px; margin: 15px 0; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+        #resultText { height: 70px; margin: 15px 0; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 12px; padding: 10px; }
+        .report-panel { display: none; margin-top: 20px; text-align: left; background: #EDF2F7; padding: 20px; border-radius: 12px; font-size: 14px; max-height: 300px; overflow-y: auto; }
         
-        .report-panel { display: none; margin-top: 20px; text-align: left; background: #EDF2F7; padding: 20px; border-radius: 12px; font-size: 14px; max-height: 200px; overflow-y: auto; }
-        .student-name-display { font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .student-info-bar { display: flex; justify-content: space-between; font-size: 14px; color: #4A5568; margin-bottom: 15px; border-bottom: 1px solid #CBD5E0; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<!-- หน้าเข้าสู่ระบบ (กรอกชื่อ) -->
-<div id="loginScreen" p="loginScreen class="card">
-    <h2>สวัสดีครับ/ค่ะ</h2>
-    <p>กรุณาพิมพ์ชื่อผู้ใช้งานเพื่อเริ่มบันทึกผล</p>
-    <input type="text" id="studentNameInput" placeholder="พิมพ์ชื่อของคุณที่นี่...">
-    <input type="text" p="studentRoomInput" placeholder="พิมพ์ชั้นของคุณที่นี่...">
-    <button class="btn btn-start" onclick="startApp()">เข้าสู่บทเรียน</button>
+<!-- หน้าจอลงชื่อเข้าใช้ -->
+<div id="loginScreen" class="card">
+    <h2>แบบทดสอบการอ่านรายบุคคล</h2>
+    <p>กรุณากรอกข้อมูลเพื่อเริ่มการประเมิน</p>
+    <input type="text" id="studentNameInput" placeholder="ชื่อ-นามสกุล">
+    <input type="text" id="studentRoomInput" placeholder="ชั้น / ห้อง (เช่น ป.1/2)">
+    <button class="btn btn-start" onclick="startApp()">เริ่มทดสอบ</button>
 </div>
 
-<!-- หน้าฝึกอ่าน -->
+<!-- หน้าจอฝึกอ่าน -->
 <div id="practiceScreen" class="card">
-    <div class="student-name-display">ผู้อ่าน: <span id="displayName"></span></div>
-    <div class="student-room-display">ชั้น: <span p="displayRoom"></span></div>
-    <div id="levelDisplay" class="level-info">สระ ะ</div>
-    <p>คำที่ <span id="wordNumber">1</span> จากทั้งหมด</p>
-    <h1 id="wordDisplay">กะ</h1>
+    <div class="student-info-bar">
+        <span>👤 ผู้อ่าน: <b id="displayName"></b></span>
+        <span>🏫 ชั้น: <b id="displayRoom"></b></span>
+    </div>
 
-    <div id="resultText">กดปุ่มสีส้มแล้วพูดตามคำข้างบน</div>
+    <div id="rLevelBadge" class="badge badge-r">R1: จดจำอักษร</div>
+    <p>คำฝึกอ่านที่ <span id="wordNumber">1</span></p>
+    <h1 id="wordDisplay">ก</h1>
+
+    <div id="resultText" style="background: #fdfdfd;">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
 
     <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่านออกเสียง</button>
-    <button class="btn btn-report" onclick="toggleReport()">📊 ดูสถิติของฉัน</button>
+    <button class="btn" style="background:#4A5568" onclick="toggleReport()">📊 ดูรายงานผล/คำแนะนำ</button>
     
     <div id="reportPanel" class="report-panel">
-        <strong>สถิติการอ่านรายคน:</strong>
-        <div id="statsContent">กำลังโหลด...</div>
+        <h3 style="margin-top:0">สรุปการประเมิน</h3>
+        <div id="statsContent">กำลังประมวลผล...</div>
         <hr>
-        <button onclick="logout()" style="border:none; background:none; color:red; cursor:pointer; font-size:12px;">ออกจากระบบ (เปลี่ยนคนอ่าน)</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:var(--secondary); cursor:pointer;">↩️ เปลี่ยนผู้เรียน</button>
     </div>
 </div>
 
 <script>
-    // URL สำหรับเชื่อม Google Sheets (ใส่ URL ของคุณที่ได้จาก Apps Script)
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwUwSuiJZz3f9G3pQ_Zl9gXsUFOF8SvYvoyrhFNLHDAfbZJW91lnh_-4ZT3PuKKVc6GeA/exec";
+    // *** แก้ไข URL ของคุณที่นี่ ***
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxRyJPJr5l2E-VbEbXrYpCG6LKivaDijuegcSQVjtPmM7ulhVDqBmDfvM4gx6xuvqBRzw/exec";
 
-    // รายการคำที่จัดเรียงตามเงื่อนไข (ะ -> า -> ผสม -> ิ -> ผสม -> ตัวสะกด)
+    // รายการคำที่แบ่งระดับตาม R1-R8
     const wordList = [
-        { word: "กะ", level: "สระ ะ (พยัญชนะเดี่ยว)" },
-        { word: "ชะ", level: "สระ ะ (พยัญชนะเดี่ยว)" },
-        { word: "กระ", level: "สระ ะ (อักษรควบ)" },
-        { word: "ขะ", level: "สระ ะ (อักษรนำ)" },
-        { word: "กา", level: "สระ า" },
-        { word: "มา", level: "สระ า" },
-        { word: "ปลา", level: "สระ า (อักษรควบ)" },
-        { word: "กะลา", level: "ผสม ะ และ า (2 คำ)" },
-        { word: "มะระ", level: "ผสม ะ และ า (2 คำ)" },
-        { word: "ปิติ", level: "สระ ิ" },
-        { word: "มะลิ", level: "ผสม ะ และ ิ (2 คำ)" },
-        { word: "บิดา", level: "ผสม ิ และ า (2 คำ)" },
-        { word: "กะทิสด", level: "ผสม ะ ิ และตัวสะกด" },
-        { word: "นกกระจิบ", level: "คำที่มีตัวสะกด" },
-        { word: "กินข้าว", level: "คำที่มีตัวสะกด" }
+        { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
+        { word: "สระอา", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
+        { word: "กะ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเดี่ยว" },
+        { word: "ตา", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
+        { word: "กล้า", r: "R3", desc: "คำซับซ้อน", advice: "ฝึกอักษรควบและวรรณยุกต์" },
+        { word: "หยุด", r: "R3", desc: "คำซับซ้อน", advice: "เน้นอักษรนำ (ห นำ)" },
+        { word: "กะลาสี", r: "R4", desc: "อ่านคำต่อเนื่อง", advice: "ฝึกอ่านคำ 2-3 พยางค์ต่อเนื่อง" },
+        { word: "ไปโรงเรียน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
+        // เพิ่มคำและระดับ R6-R8 ได้ตามต้องการ
     ];
 
     let currentStudent = "";
+    let currentRoom = "";
     let currentIndex = 0;
     let attempts = 0;
 
     function startApp() {
         const nameInput = document.getElementById("studentNameInput").value;
-        if (nameInput.trim() === "") {
-            alert("กรุณาใส่ชื่อก่อนเริ่มนะครับ");
+        const roomInput = document.getElementById("studentRoomInput").value;
+        
+        if (!nameInput || !roomInput) {
+            alert("กรุณากรอกทั้งชื่อและชั้นเรียนครับ");
             return;
         }
+
         currentStudent = nameInput;
+        currentRoom = roomInput;
+        
         document.getElementById("displayName").innerText = currentStudent;
+        document.getElementById("displayRoom").innerText = currentRoom;
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("practiceScreen").style.display = "block";
+        
         updateDisplay();
     }
 
     function updateDisplay() {
-        const current = wordList[currentIndex];
-        document.getElementById("wordDisplay").innerText = current.word;
+        const item = wordList[currentIndex];
+        document.getElementById("wordDisplay").innerText = item.word;
         document.getElementById("wordNumber").innerText = currentIndex + 1;
-        document.getElementById("levelDisplay").innerText = "ระดับ: " + current.level;
-        document.getElementById("resultText").innerText = "กดปุ่มไมค์เพื่ออ่านคำว่า " + current.word;
-        document.getElementById("resultText").style.color = "#718096";
+        document.getElementById("rLevelBadge").innerText = `${item.r}: ${item.desc}`;
+        document.getElementById("resultText").innerText = "พร้อมฟังแล้วครับ...";
+        document.getElementById("resultText").style.backgroundColor = "#fdfdfd";
         attempts = 0;
     }
 
     function startListening() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            alert("เบราว์เซอร์นี้ไม่รองรับระบบเสียง แนะนำให้ใช้ Chrome บนมือถือหรือคอมพิวเตอร์ครับ");
-            return;
-        }
-
-        const recognition = new SpeechRecognition();
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "th-TH";
-        const resultElement = document.getElementById("resultText");
         
-        resultElement.innerText = "正在听... กำลังฟัง...";
-        resultElement.style.color = "#D69E2E";
+        document.getElementById("resultText").innerText = "กำลังฟัง...";
         attempts++;
 
         recognition.start();
 
         recognition.onresult = function(event) {
-            const spokenText = event.results[0][0].transcript;
-            const targetWord = wordList[currentIndex].word;
+            const spoken = event.results[0][0].transcript;
+            const target = wordList[currentIndex].word;
 
-            if (spokenText.includes(targetWord)) {
-                resultElement.innerText = "🎉 ถูกต้อง! เก่งมากครับ";
-                resultElement.style.color = "#38A169";
-                saveStatsToSheet(targetWord, wordList[currentIndex].level, "ผ่าน", attempts);
-                
-                setTimeout(() => {
-                    if (currentIndex < wordList.length - 1) {
-                        currentIndex++;
-                        updateDisplay();
-                    } else {
-                        resultElement.innerText = "🎊 เยี่ยมมาก! คุณเรียนจบทุกบทเรียนแล้ว";
-                        setTimeout(() => { logout(); }, 5000);
-                    }
-                }, 2000);
+            if (spoken.includes(target)) {
+                handleSuccess(spoken);
             } else {
-                resultElement.innerText = `คุณอ่านว่า "${spokenText}" (ลองอีกครั้งนะ)`;
-                resultElement.style.color = "#E53E3E";
+                handleFailure(spoken);
             }
         };
     }
 
-    function saveStatsToSheet(word, level, status, count) {
-        // บันทึกลง LocalStorage สำหรับดูรายงานหน้าเว็บ
-        let localData = JSON.parse(localStorage.getItem('readingData_' + currentStudent)) || [];
-        localData.push({ word, level, status, count, time: new Date().toLocaleString() });
-        localStorage.setItem('readingData_' + currentStudent, JSON.stringify(localData));
+    function handleSuccess(spoken) {
+        const item = wordList[currentIndex];
+        const resDiv = document.getElementById("resultText");
+        resDiv.innerText = `✅ ถูกต้อง! (คุณพูดว่า: ${spoken})`;
+        resDiv.style.backgroundColor = "#C6F6D5";
 
-        // ส่งไปยัง Google Sheets
-        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbwUwSuiJZz3f9G3pQ_Zl9gXsUFOF8SvYvoyrhFNLHDAfbZJW91lnh_-4ZT3PuKKVc6GeA/exec") {
-            fetch(GOOGLE_SHEET_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                body: JSON.stringify({
-                    student: currentStudent,
-                    word: word,
-                    level: level,
-                    status: status,
-                    attempts: count
-                })
-            });
+        saveData("ผ่าน", attempts, "ผ่านเกณฑ์ระดับนี้");
+
+        setTimeout(() => {
+            if (currentIndex < wordList.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            } else {
+                alert("สิ้นสุดการทดสอบครบทุกระดับแล้ว");
+                toggleReport();
+            }
+        }, 2000);
+    }
+
+    function handleFailure(spoken) {
+        const resDiv = document.getElementById("resultText");
+        resDiv.innerText = `❌ ยังไม่ชัด (คุณอ่านว่า: ${spoken}) ลองใหม่นะครับ`;
+        resDiv.style.backgroundColor = "#FED7D7";
+        
+        // ถ้าพยายามเกิน 3 ครั้ง ให้ถือว่า "ควรปรับปรุงในระดับนี้"
+        if (attempts >= 3) {
+            const item = wordList[currentIndex];
+            saveData("ควรปรับปรุง", attempts, item.advice);
+            alert(`แนะนำ: ดูเหมือนจะติดขัดที่ระดับ ${item.r}\nข้อแนะนำ: ${item.advice}`);
         }
+    }
+
+    function saveData(status, count, advice) {
+        const item = wordList[currentIndex];
+        
+        // 1. บันทึกในเครื่อง (Local) เพื่อแสดงรายงานทันที
+        let history = JSON.parse(localStorage.getItem('R_Stats_' + currentStudent)) || [];
+        history.push({
+            word: item.word,
+            rLevel: item.r,
+            status: status,
+            attempts: count,
+            advice: advice,
+            time: new Date().toLocaleString()
+        });
+        localStorage.setItem('R_Stats_' + currentStudent, JSON.stringify(history));
+
+        // 2. ส่งไป Google Sheets
+        fetch(GOOGLE_SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                student: currentStudent,
+                room: currentRoom,
+                word: item.word,
+                rLevel: item.r,
+                status: status,
+                attempts: count,
+                advice: advice
+            })
+        });
+        updateStatsUI();
+    }
+
+    function updateStatsUI() {
+        const history = JSON.parse(localStorage.getItem('R_Stats_' + currentStudent)) || [];
+        const content = document.getElementById("statsContent");
+        
+        if (history.length === 0) {
+            content.innerHTML = "ยังไม่มีข้อมูลการทดสอบ";
+            return;
+        }
+
+        content.innerHTML = history.reverse().map(h => `
+            <div style="margin-bottom:10px; padding:10px; background:white; border-radius:8px; border-left:4px solid ${h.status === 'ผ่าน' ? '#38A169' : '#E53E3E'}">
+                <b>${h.rLevel}: ${h.word}</b> - ${h.status} (${h.attempts} ครั้ง)<br>
+                <small style="color:#718096">คำแนะนำ: ${h.advice}</small>
+            </div>
+        `).join('');
     }
 
     function toggleReport() {
         const panel = document.getElementById("reportPanel");
-        const statsContent = document.getElementById("statsContent");
-        
-        if (panel.style.display === "none" || panel.style.display === "") {
-            panel.style.display = "block";
-            let localData = JSON.parse(localStorage.getItem('readingData_' + currentStudent)) || [];
-            if (localData.length === 0) {
-                statsContent.innerHTML = "ยังไม่มีข้อมูลการอ่าน";
-            } else {
-                statsContent.innerHTML = localData.map(item => 
-                    `• ${item.word} (${item.count} ครั้ง) - <small>${item.time}</small>`
-                ).join('<br>');
-            }
-        } else {
-            panel.style.display = "none";
-        }
-    }
-
-    function logout() {
-        if(confirm("ต้องการเปลี่ยนผู้ใช้งานหรือเริ่มต้นใหม่ใช่หรือไม่?")) {
-            location.reload();
-        }
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+        updateStatsUI();
     }
 </script>
 
