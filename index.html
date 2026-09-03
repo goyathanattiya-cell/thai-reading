@@ -3,73 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมฝึกอ่านประเมินระดับ R1-R8</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <title>HEARING - ระบบประเมินการอ่าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4FD1C5; --secondary: #ED8936; --success: #38A169; --danger: #E53E3E; --dark: #2D3748; }
-        body { font-family: 'Sarabun', sans-serif; background-color: #F4F9F9; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 550px; width: 100%; text-align: center; }
-        
-        #loginScreen { display: block; }
-        #practiceScreen { display: none; }
-        
-        input[type="text"] { width: 85%; padding: 12px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 18px; text-align: center; }
-        
-        .badge { display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
-        .badge-r { background: #E9D8FD; color: #6B46C1; }
-        
-        h1 { font-size: 80px; color: var(--dark); margin: 15px 0; }
-        .btn { border: none; padding: 15px 28px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s; color: white; width: 100%; margin-bottom: 10px; }
+        :root {
+            --primary: #4FD1C5;
+            --secondary: #F6AD55;
+            --accent: #B794F4;
+            --success: #68D391;
+            --danger: #FC8181;
+            --bg: #E6FFFA;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border: 5px solid white;
+        }
+
+        h2 { font-family: 'Mitr', sans-serif; color: #2D3748; margin-bottom: 5px; }
+        .sub-title { color: #718096; margin-bottom: 25px; font-size: 0.9rem; }
+
+        /* การจัดการหน้าจอ */
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* ส่วนของ Input */
+        textarea, select, input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #E2E8F0;
+            border-radius: 15px;
+            font-size: 16px;
+            font-family: 'Sarabun';
+        }
+
+        /* ปุ่มต่างๆ */
+        .btn {
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            color: white;
+            width: 100%;
+            margin: 10px 0;
+            font-family: 'Mitr';
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
         .btn-start { background-color: var(--primary); }
-        .btn-speak { background-color: var(--secondary); box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4); }
-        
-        #resultText { height: 70px; margin: 15px 0; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 12px; padding: 10px; }
-        .report-panel { display: none; margin-top: 20px; text-align: left; background: #EDF2F7; padding: 20px; border-radius: 12px; font-size: 14px; max-height: 300px; overflow-y: auto; }
-        
-        .student-info-bar { display: flex; justify-content: space-between; font-size: 14px; color: #4A5568; margin-bottom: 15px; border-bottom: 1px solid #CBD5E0; padding-bottom: 10px; }
+        .btn-speak { background-color: var(--secondary); font-size: 22px; }
+        .btn-report { background-color: var(--accent); }
+        .btn-pass { background-color: var(--success); }
+        .btn-fail { background-color: var(--danger); width: 48%; }
+        .btn-export { background-color: #4A5568; }
+
+        /* การแสดงผลคำศัพท์ */
+        .word-card {
+            background: #F7FAFC;
+            padding: 40px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px dashed #CBD5E0;
+        }
+
+        #wordDisplay {
+            font-size: 72px;
+            color: #2D3748;
+            margin: 0;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: #E9D8FD;
+            color: #6B46C1;
+        }
+
+        #resultText {
+            min-height: 50px;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            background: #EDF2F7;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
+        th, td { border: 1px solid #CBD5E0; padding: 8px; text-align: left; }
+        th { background: #EDF2F7; }
+
     </style>
 </head>
 <body>
 
-<!-- หน้าจอลงชื่อเข้าใช้ -->
-<div id="loginScreen" class="card">
-    <h2>ระบบ HEARING พัฒนาการอ่านรายบุคคล Byโรงเรียนวัดหนองโพรง</h2>
-    <h2>Reading Profile</h2>
-    <p>กรุณากรอกข้อมูลเพื่อเริ่มการประเมิน</p>
-    <input type="text" id="studentNameInput" placeholder="ชื่อ-นามสกุล">
-    <input type="text" id="studentRoomInput" placeholder="ชั้น / ห้อง (เช่น ป.1/2)">
-    <button class="btn btn-start" onclick="startApp()">เริ่มทดสอบ</button>
-</div>
-
-<!-- หน้าจอฝึกอ่าน -->
-<div id="practiceScreen" class="card">
-    <div class="student-info-bar">
-        <span>👤 ผู้อ่าน: <b id="displayName"></b></span>
-        <span>🏫 ชั้น: <b id="displayRoom"></b></span>
+<div class="container">
+    <!-- หน้า 1: ตั้งค่าและรายชื่อ -->
+    <div id="setupScreen" class="screen active">
+        <h2>🏫 HEARING Project</h2>
+        <p class="sub-title">พัฒนาการอ่านรายบุคคล โรงเรียนวัดหนองโพรง</p>
+        
+        <div style="text-align:left; padding:0 20px;">
+            <label><b>1. นำเข้ารายชื่อนักเรียน (คัดลอกจาก Excel มาวางได้เลย):</b></label>
+            <textarea id="studentListInput" rows="5" placeholder="เด็กชายสมชาย ดีมาก&#10;เด็กหญิงสมศรี ขยันเรียน"></textarea>
+            
+            <label><b>2. ระบุชั้นเรียน:</b></label>
+            <input type="text" id="roomInput" placeholder="เช่น ป.1/1">
+            
+            <label><b>3. เลือกชื่อเพื่อเริ่มทดสอบ:</b></label>
+            <select id="studentSelect">
+                <option value="">-- กรุณาใส่รายชื่อก่อน --</option>
+            </select>
+        </div>
+        
+        <button class="btn btn-start" onclick="startApp()">เริ่มการทดสอบ 🚀</button>
+        <button class="btn btn-export" onclick="exportToCSV()">ดาวน์โหลดไฟล์สรุป (CSV) 📥</button>
     </div>
 
-    <div id="rLevelBadge" class="badge badge-r">R1: จดจำอักษร</div>
-    <p>คำฝึกอ่านที่ <span id="wordNumber">1</span></p>
-    <h1 id="wordDisplay">ก</h1>
+    <!-- หน้า 2: หน้าจอฝึกอ่าน -->
+    <div id="practiceScreen" class="screen">
+        <div class="student-info">
+            <span>👤 <b id="displayName"></b></span>
+            <span>🏫 <b id="displayRoom"></b></span>
+        </div>
 
-    <div id="resultText" style="background: #fdfdfd;">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
+        <div id="rLevelBadge" class="badge">R1</div>
+        <div class="word-card">
+            <p style="margin:0; color:#A0AEC0;">คำฝึกอ่านที่ <span id="wordNumber">1</span></p>
+            <h1 id="wordDisplay">ก</h1>
+        </div>
 
-    <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่านออกเสียง</button>
-    <button class="btn" style="background:#4A5568" onclick="toggleReport()">📊 ดูรายงานผล/คำแนะนำ</button>
-    
-    <div id="reportPanel" class="report-panel">
-        <h3 style="margin-top:0">สรุปการประเมิน</h3>
-        <div id="statsContent">กำลังประมวลผล...</div>
-        <hr>
-        <button onclick="location.reload()" style="background:none; border:none; color:var(--secondary); cursor:pointer;">↩️ เปลี่ยนผู้เรียน</button>
+        <div id="resultText">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
+
+        <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
+        
+        <div style="display:flex; justify-content: space-between;">
+            <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ครูให้ผ่าน</button>
+        </div>
+        
+        <button class="btn btn-report" onclick="toggleReport()">📊 ดูรายงานผล</button>
+    </div>
+
+    <!-- หน้า 3: รายงานผล -->
+    <div id="reportPanel" class="screen">
+        <h3>สรุปผลการประเมิน</h3>
+        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;">
+            <!-- ตารางจะมาที่นี่ -->
+        </div>
+        <button class="btn btn-start" onclick="showScreen('setupScreen')">🏠 กลับหน้าแรก</button>
     </div>
 </div>
 
 <script>
-    // *** แก้ไข URL ของคุณที่นี่ ***
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbya63JaXAfnSAYisfaSlbyqbf-Ofj1qdalnr5xOZy1FW1BRjDIveAWXtNJ18l_v_Rvl_g/exec";
-
-    // รายการคำที่แบ่งระดับตาม R1-R8
+    // --- ตั้งค่าข้อมูลคำศัพท์ ---
     const wordList = [
         { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
         { word: "ค", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
@@ -131,32 +253,45 @@
         { word: "ห้ามส่งเสียงดัง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
         { word: "ควรมีมารยาทต่อกัน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
         { word: "มันพยายามจะจับวัวกิน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        // เพิ่มคำและระดับ R6-R8 ได้ตามต้องการ
     ];
 
     let currentStudent = "";
     let currentRoom = "";
     let currentIndex = 0;
-    let attempts = 0;
+    let allResults = JSON.parse(localStorage.getItem('ReadingResults')) || [];
+
+    // ระบบอัปเดตรายชื่อจาก Textarea
+    document.getElementById('studentListInput').addEventListener('input', function() {
+        const names = this.value.split('\n').filter(n => n.trim() !== "");
+        const select = document.getElementById('studentSelect');
+        select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+        names.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name.trim();
+            opt.innerText = name.trim();
+            select.appendChild(opt);
+        });
+    });
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
     function startApp() {
-        const nameInput = document.getElementById("studentNameInput").value;
-        const roomInput = document.getElementById("studentRoomInput").value;
+        currentStudent = document.getElementById("studentSelect").value;
+        currentRoom = document.getElementById("roomInput").value;
         
-        if (!nameInput || !roomInput) {
-            alert("กรุณากรอกทั้งชื่อและชั้นเรียนครับ");
+        if (!currentStudent || !currentRoom) {
+            alert("กรุณาเลือกชื่อนักเรียนและใส่ชั้นเรียนก่อนครับ");
             return;
         }
 
-        currentStudent = nameInput;
-        currentRoom = roomInput;
-        
         document.getElementById("displayName").innerText = currentStudent;
         document.getElementById("displayRoom").innerText = currentRoom;
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("practiceScreen").style.display = "block";
-        
+        currentIndex = 0;
         updateDisplay();
+        showScreen('practiceScreen');
     }
 
     function updateDisplay() {
@@ -165,16 +300,13 @@
         document.getElementById("wordNumber").innerText = currentIndex + 1;
         document.getElementById("rLevelBadge").innerText = `${item.r}: ${item.desc}`;
         document.getElementById("resultText").innerText = "พร้อมฟังแล้วครับ...";
-        document.getElementById("resultText").style.backgroundColor = "#fdfdfd";
-        attempts = 0;
+        document.getElementById("resultText").style.background = "#F7FAFC";
     }
 
     function startListening() {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "th-TH";
-        
-        document.getElementById("resultText").innerText = "กำลังฟัง...";
-        attempts++;
+        document.getElementById("resultText").innerText = "🎤 กำลังฟัง...";
 
         recognition.start();
 
@@ -182,10 +314,11 @@
             const spoken = event.results[0][0].transcript;
             const target = wordList[currentIndex].word;
 
-            if (spoken.includes(target)) {
+            if (spoken.includes(target) || target.includes(spoken)) {
                 handleSuccess(spoken);
             } else {
-                handleFailure(spoken);
+                document.getElementById("resultText").innerText = `❌ ยังไม่ชัด (คุณอ่านว่า: ${spoken})`;
+                document.getElementById("resultText").style.background = "#FED7D7";
             }
         };
     }
@@ -193,88 +326,80 @@
     function handleSuccess(spoken) {
         const item = wordList[currentIndex];
         const resDiv = document.getElementById("resultText");
-        resDiv.innerText = `✅ ถูกต้อง! (คุณพูดว่า: ${spoken})`;
-        resDiv.style.backgroundColor = "#C6F6D5";
+        resDiv.innerText = `✅ ถูกต้อง! (${spoken})`;
+        resDiv.style.background = "#C6F6D5";
 
-        saveData("ผ่าน", attempts, "ผ่านเกณฑ์ระดับนี้");
+        saveData(item, "ผ่าน");
 
         setTimeout(() => {
             if (currentIndex < wordList.length - 1) {
                 currentIndex++;
                 updateDisplay();
             } else {
-                alert("ยินดีด้วย เธออ่านออกแล้ว ไป อ่านรู้เรื่อง กันต่อเลย");
+                alert("เก่งมาก! ทดสอบครบทุกคำแล้ว");
                 toggleReport();
             }
-        }, 2000);
+        }, 1500);
     }
 
-    function handleFailure(spoken) {
-        const resDiv = document.getElementById("resultText");
-        resDiv.innerText = `❌ ยังไม่ชัด (คุณอ่านว่า: ${spoken}) ลองใหม่นะครับ`;
-        resDiv.style.backgroundColor = "#FED7D7";
-        
-        // ถ้าพยายามเกิน 3 ครั้ง ให้ถือว่า "ควรปรับปรุงในระดับนี้"
-        if (attempts >= 3) {
-            const item = wordList[currentIndex];
-            saveData("ควรปรับปรุง", attempts, item.advice);
-            alert(`แนะนำ: ดูเหมือนจะติดขัดที่ระดับ ${item.r}\nข้อแนะนำ: ${item.advice}`);
-        }
-    }
-
-    function saveData(status, count, advice) {
-        const item = wordList[currentIndex];
-        
-        // 1. บันทึกในเครื่อง (Local) เพื่อแสดงรายงานทันที
-        let history = JSON.parse(localStorage.getItem('R_Stats_' + currentStudent)) || [];
-        history.push({
+    function saveData(item, status) {
+        const data = {
+            student: currentStudent,
+            room: currentRoom,
             word: item.word,
             rLevel: item.r,
             status: status,
-            attempts: count,
-            advice: advice,
-            time: new Date().toLocaleString()
-        });
-        localStorage.setItem('R_Stats_' + currentStudent, JSON.stringify(history));
-
-        // 2. ส่งไป Google Sheets
-        fetch(GOOGLE_SHEET_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                student: currentStudent,
-                room: currentRoom,
-                word: item.word,
-                rLevel: item.r,
-                status: status,
-                attempts: count,
-                advice: advice
-            })
-        });
-        updateStatsUI();
-    }
-
-    function updateStatsUI() {
-        const history = JSON.parse(localStorage.getItem('R_Stats_' + currentStudent)) || [];
-        const content = document.getElementById("statsContent");
+            time: new Date().toLocaleString('th-TH')
+        };
+        allResults.push(data);
+        localStorage.setItem('ReadingResults', JSON.stringify(allResults));
         
-        if (history.length === 0) {
-            content.innerHTML = "ยังไม่มีข้อมูลการทดสอบ";
-            return;
+        // ส่งไป Google Sheets (ถ้ามีการตั้งค่า URL)
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbznuK9RW8-YY8TArtS4IfKMEMac0dZ2AxZrphg2eFTx3kTeISkAe19sT1jsxlKBUYc/exec";
+        if(GOOGLE_URL.includes("https")) {
+            fetch(GOOGLE_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
         }
-
-        content.innerHTML = history.reverse().map(h => `
-            <div style="margin-bottom:10px; padding:10px; background:white; border-radius:8px; border-left:4px solid ${h.status === 'ผ่าน' ? '#38A169' : '#E53E3E'}">
-                <b>${h.rLevel}: ${h.word}</b> - ${h.status} (${h.attempts} ครั้ง)<br>
-                <small style="color:#718096">คำแนะนำ: ${h.advice}</small>
-            </div>
-        `).join('');
     }
 
     function toggleReport() {
-        const panel = document.getElementById("reportPanel");
-        panel.style.display = panel.style.display === "none" ? "block" : "none";
-        updateStatsUI();
+        showScreen('reportPanel');
+        const holder = document.getElementById("statsTableHolder");
+        let html = `<table><tr><th>ชื่อ</th><th>ระดับ</th><th>คำ</th><th>ผล</th><th>เวลา</th></tr>`;
+        
+        // กรองเอาเฉพาะของนักเรียนคนปัจจุบัน
+        const mine = allResults.filter(r => r.student === currentStudent);
+        mine.reverse().forEach(r => {
+            html += `<tr>
+                <td>${r.student}</td>
+                <td>${r.rLevel}</td>
+                <td>${r.word}</td>
+                <td style="color:green"><b>${r.status}</b></td>
+                <td>${r.time}</td>
+            </tr>`;
+        });
+        html += `</table>`;
+        holder.innerHTML = html;
+    }
+
+    function exportToCSV() {
+        if(allResults.length === 0) { alert("ไม่มีข้อมูลให้ดาวน์โหลด"); return; }
+        
+        let csv = "\ufeffชื่อ,ชั้น,ระดับ,คำถาม,ผลการอ่าน,เวลา\n";
+        allResults.forEach(r => {
+            csv += `${r.student},${r.room},${r.rLevel},${r.word},${r.status},${r.time}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", `ผลการอ่าน_โรงเรียนวัดหนองโพรง.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>
 
