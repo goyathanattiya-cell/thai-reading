@@ -3,132 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEARING - ระบบประเมินการอ่าน</title>
+    <title>HEARING SCHOOL - ดึงรายชื่ออัตโนมัติ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #4FD1C5;
-            --secondary: #F6AD55;
-            --accent: #B794F4;
-            --success: #68D391;
-            --danger: #FC8181;
-            --bg: #E6FFFA;
-            --card-bg: #FFFFFF;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-            border: 5px solid white;
-        }
-
+        :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #68D391; --danger: #FC8181; --bg: #E6FFFA; --card-bg: #FFFFFF; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: var(--card-bg); padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; border: 5px solid white; }
         h2 { font-family: 'Mitr', sans-serif; color: #2D3748; margin-bottom: 5px; }
         .sub-title { color: #718096; margin-bottom: 25px; font-size: 0.9rem; }
-
-        /* การจัดการหน้าจอ */
         .screen { display: none; }
         .active { display: block; }
-
-        /* ส่วนของ Input */
-        textarea, select, input {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #E2E8F0;
-            border-radius: 15px;
-            font-size: 16px;
-            font-family: 'Sarabun';
-        }
-
-        /* ปุ่มต่างๆ */
-        .btn {
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            color: white;
-            width: 100%;
-            margin: 10px 0;
-            font-family: 'Mitr';
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        select, input { width: 90%; padding: 15px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 15px; font-size: 18px; font-family: 'Sarabun'; }
+        .btn { border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; width: 100%; margin: 10px 0; font-family: 'Mitr'; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-start { background-color: var(--primary); }
         .btn-speak { background-color: var(--secondary); font-size: 22px; }
-        .btn-report { background-color: var(--accent); }
         .btn-pass { background-color: var(--success); }
-        .btn-fail { background-color: var(--danger); width: 48%; }
         .btn-export { background-color: #4A5568; }
-
-        /* การแสดงผลคำศัพท์ */
-        .word-card {
-            background: #F7FAFC;
-            padding: 40px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            border: 3px dashed #CBD5E0;
-        }
-
-        #wordDisplay {
-            font-size: 72px;
-            color: #2D3748;
-            margin: 0;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: #E9D8FD;
-            color: #6B46C1;
-        }
-
-        #resultText {
-            min-height: 50px;
-            margin: 15px 0;
-            padding: 15px;
-            border-radius: 15px;
-            font-weight: bold;
-        }
-
-        .student-info {
-            display: flex;
-            justify-content: space-between;
-            background: #EDF2F7;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
-        th, td { border: 1px solid #CBD5E0; padding: 8px; text-align: left; }
-        th { background: #EDF2F7; }
-
+        .word-card { background: #F7FAFC; padding: 40px 20px; border-radius: 20px; margin: 20px 0; border: 3px dashed #CBD5E0; }
+        #wordDisplay { font-size: 72px; color: #2D3748; margin: 0; font-weight: bold; }
+        .badge { display: inline-block; padding: 8px 20px; border-radius: 50px; font-weight: bold; margin-bottom: 10px; background: #E9D8FD; color: #6B46C1; }
+        #resultText { min-height: 50px; margin: 15px 0; padding: 15px; border-radius: 15px; font-weight: bold; }
+        .student-info { display: flex; justify-content: space-between; background: #EDF2F7; padding: 10px 20px; border-radius: 50px; font-size: 14px; margin-bottom: 20px; }
+        .loading-text { color: var(--secondary); font-weight: bold; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -136,24 +33,23 @@
 <div class="container">
     <!-- หน้า 1: ตั้งค่าและรายชื่อ -->
     <div id="setupScreen" class="screen active">
-        <h2>🏫 HEARING SCHOOL </h2>
+        <h2>🏫 HEARING SCHOOL</h2>
         <p class="sub-title">พัฒนาการอ่านรายบุคคล โรงเรียนวัดหนองโพรง</p>
         
         <div style="text-align:left; padding:0 20px;">
-            <label><b>1. นำเข้ารายชื่อนักเรียน (คัดลอกจาก Excel มาวางได้เลย):</b></label>
-            <textarea id="studentListInput" rows="5" placeholder="เด็กชายสมชาย ดีมาก&#10;เด็กหญิงสมศรี ขยันเรียน"></textarea>
-            
-            <label><b>2. ระบุชั้นเรียน:</b></label>
+            <label><b>1. ระบุชั้นเรียน:</b></label>
             <input type="text" id="roomInput" placeholder="เช่น ป.1/1">
             
-            <label><b>3. เลือกชื่อเพื่อเริ่มทดสอบ:</b></label>
+            <label><b>2. เลือกชื่อนักเรียน:</b></label>
+            <div id="loadingStatus" class="loading-text">🔄 กำลังโหลดรายชื่อจากฐานข้อมูล...</div>
             <select id="studentSelect">
-                <option value="">-- กรุณาใส่รายชื่อก่อน --</option>
+                <option value="">-- กำลังโหลดข้อมูล --</option>
             </select>
+            <small style="color: #A0AEC0;">*หากไม่มีชื่อ ให้เพิ่มใน Google Sheets แล้วรีเฟรชหน้านี้</small>
         </div>
         
-        <button class="btn btn-start" onclick="startApp()">เริ่มการทดสอบ 🚀</button>
-        <button class="btn btn-export" onclick="exportToCSV()">ดาวน์โหลดไฟล์สรุป (CSV) 📥</button>
+        <button class="btn btn-start" onclick="startApp()" id="startBtn" disabled>รอโหลดข้อมูลสักครู่... 🚀</button>
+        <button class="btn btn-export" onclick="exportToCSV()">ดาวน์โหลดไฟล์สรุปคะแนน (CSV) 📥</button>
     </div>
 
     <!-- หน้า 2: หน้าจอฝึกอ่าน -->
@@ -162,36 +58,29 @@
             <span>👤 <b id="displayName"></b></span>
             <span>🏫 <b id="displayRoom"></b></span>
         </div>
-
         <div id="rLevelBadge" class="badge">R1</div>
         <div class="word-card">
             <p style="margin:0; color:#A0AEC0;">คำฝึกอ่านที่ <span id="wordNumber">1</span></p>
             <h1 id="wordDisplay">ก</h1>
         </div>
-
         <div id="resultText">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
-
         <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
-        
-        <div style="display:flex; justify-content: space-between;">
-            <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ครูให้ผ่าน</button>
-        </div>
-        
-        <button class="btn btn-report" onclick="toggleReport()">📊 ดูรายงานผล</button>
+        <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ครูให้ผ่าน (ข้ามคำนี้)</button>
+        <button class="btn" style="background:#B794F4" onclick="location.reload()">🏠 กลับหน้าหลัก</button>
     </div>
 
     <!-- หน้า 3: รายงานผล -->
     <div id="reportPanel" class="screen">
         <h3>สรุปผลการประเมิน</h3>
-        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;">
-            <!-- ตารางจะมาที่นี่ -->
-        </div>
-        <button class="btn btn-start" onclick="showScreen('setupScreen')">🏠 กลับหน้าแรก</button>
+        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;"></div>
+        <button class="btn btn-start" onclick="location.reload()">🏠 เริ่มต้นใหม่ / เปลี่ยนนักเรียน</button>
     </div>
 </div>
 
 <script>
-    // --- ตั้งค่าข้อมูลคำศัพท์ ---
+    // *** สำคัญ: นำ URL ที่ได้จาก Google Apps Script มาวางตรงนี้ ***
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwYdbfggAEOdNu693MUy8_bdNUiFkqb05jBeEEFRsSQHAWWanBKjNtsDcMdq8b5KHnd/exec";
+
     const wordList = [
         { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
         { word: "ค", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
@@ -243,15 +132,15 @@
         { word: "โจ๊กหมู", r: "R4", desc: "อ่านคำต่อเนื่อง", advice: "ฝึกอ่านคำ 2-3 พยางค์ต่อเนื่อง" },
         { word: "หนามแหลมคม", r: "R4", desc: "อ่านคำต่อเนื่อง", advice: "ฝึกอ่านคำ 2-3 พยางค์ต่อเนื่อง" },
         { word: "อ่อนเปลี้ยหมดแรง", r: "R4", desc: "อ่านคำต่อเนื่อง", advice: "ฝึกอ่านคำ 2-3 พยางค์ต่อเนื่อง" },
-        { word: "หนูอยากไปโรงเรียน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "วารีไปดูกีฬาที่สนาม", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "เช้าวันนี้ฉันเห็นรุ้งกินน้ำบนท้องฟ้า", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "หมอรักษาผู้ป่วยยากจนในชุมชนแออัด", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "กระต่ายกินผักบุ้งในไร่ริมชายทุ่ง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "พวกเราเป็นชาวเขาเผ่าหนึ่ง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "เรารักพระองค์มาก", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "ห้ามส่งเสียงดัง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
-        { word: "ควรมีมารยาทต่อกัน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
+        { word: "หนูอยากไปโรงเรียน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "วารีไปดูกีฬาที่สนาม", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "เช้าวันนี้ฉันเห็นรุ้งกินน้ำบนท้องฟ้า", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "หมอรักษาผู้ป่วยยากจนในชุมชนแออัด", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "กระต่ายกินผักบุ้งในไร่ริมชายทุ่ง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "พวกเราเป็นชาวเขาเผ่าหนึ่ง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "เรารักพระองค์มาก", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "ห้ามส่งเสียงดัง", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
+        { word: "ควรมีมารยาทต่อกัน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" },
         { word: "มันพยายามจะจับวัวกิน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
     ];
 
@@ -260,18 +149,28 @@
     let currentIndex = 0;
     let allResults = JSON.parse(localStorage.getItem('ReadingResults')) || [];
 
-    // ระบบอัปเดตรายชื่อจาก Textarea
-    document.getElementById('studentListInput').addEventListener('input', function() {
-        const names = this.value.split('\n').filter(n => n.trim() !== "");
-        const select = document.getElementById('studentSelect');
-        select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
-        names.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name.trim();
-            opt.innerText = name.trim();
-            select.appendChild(opt);
-        });
-    });
+    // --- ฟังก์ชันดึงรายชื่อจาก Google Sheets อัตโนมัติ ---
+    window.onload = function() {
+        fetch(GOOGLE_URL)
+            .then(res => res.json())
+            .then(names => {
+                const select = document.getElementById('studentSelect');
+                select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+                names.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.innerText = name;
+                    select.appendChild(opt);
+                });
+                document.getElementById('loadingStatus').style.display = 'none';
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').innerText = 'เริ่มการทดสอบ 🚀';
+            })
+            .catch(err => {
+                document.getElementById('loadingStatus').innerText = "❌ โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบลิงก์ Script";
+                console.error(err);
+            });
+    };
 
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -281,12 +180,7 @@
     function startApp() {
         currentStudent = document.getElementById("studentSelect").value;
         currentRoom = document.getElementById("roomInput").value;
-        
-        if (!currentStudent || !currentRoom) {
-            alert("กรุณาเลือกชื่อนักเรียนและใส่ชั้นเรียนก่อนครับ");
-            return;
-        }
-
+        if (!currentStudent || !currentRoom) { alert("กรุณาเลือกชื่อนักเรียนและใส่ชั้นเรียนครับ"); return; }
         document.getElementById("displayName").innerText = currentStudent;
         document.getElementById("displayRoom").innerText = currentRoom;
         currentIndex = 0;
@@ -307,13 +201,10 @@
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "th-TH";
         document.getElementById("resultText").innerText = "🎤 กำลังฟัง...";
-
         recognition.start();
-
         recognition.onresult = function(event) {
             const spoken = event.results[0][0].transcript;
             const target = wordList[currentIndex].word;
-
             if (spoken.includes(target) || target.includes(spoken)) {
                 handleSuccess(spoken);
             } else {
@@ -325,81 +216,42 @@
 
     function handleSuccess(spoken) {
         const item = wordList[currentIndex];
-        const resDiv = document.getElementById("resultText");
-        resDiv.innerText = `✅ ถูกต้อง! (${spoken})`;
-        resDiv.style.background = "#C6F6D5";
-
+        document.getElementById("resultText").innerText = `✅ ถูกต้อง! (${spoken})`;
+        document.getElementById("resultText").style.background = "#C6F6D5";
         saveData(item, "ผ่าน");
-
         setTimeout(() => {
-            if (currentIndex < wordList.length - 1) {
-                currentIndex++;
-                updateDisplay();
-            } else {
-                alert("เก่งมาก! ทดสอบครบทุกคำแล้ว");
-                toggleReport();
-            }
+            if (currentIndex < wordList.length - 1) { currentIndex++; updateDisplay(); }
+            else { alert("เก่งมาก! ทดสอบครบแล้ว"); toggleReport(); }
         }, 1500);
     }
 
     function saveData(item, status) {
-        const data = {
-            student: currentStudent,
-            room: currentRoom,
-            word: item.word,
-            rLevel: item.r,
-            status: status,
-            time: new Date().toLocaleString('th-TH')
-        };
-        allResults.push(data);
+        const data = { student: currentStudent, room: currentRoom, word: item.word, rLevel: item.r, status: status };
+        allResults.push({ ...data, time: new Date().toLocaleString('th-TH') });
         localStorage.setItem('ReadingResults', JSON.stringify(allResults));
-        
-        // ส่งไป Google Sheets (ถ้ามีการตั้งค่า URL)
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbznuK9RW8-YY8TArtS4IfKMEMac0dZ2AxZrphg2eFTx3kTeISkAe19sT1jsxlKBUYc/exec";
-        if(GOOGLE_URL.includes("https")) {
-            fetch(GOOGLE_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(data)
-            });
-        }
+        fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
     function toggleReport() {
         showScreen('reportPanel');
         const holder = document.getElementById("statsTableHolder");
-        let html = `<table><tr><th>ชื่อ</th><th>ระดับ</th><th>คำ</th><th>ผล</th><th>เวลา</th></tr>`;
-        
-        // กรองเอาเฉพาะของนักเรียนคนปัจจุบัน
-        const mine = allResults.filter(r => r.student === currentStudent);
-        mine.reverse().forEach(r => {
-            html += `<tr>
-                <td>${r.student}</td>
-                <td>${r.rLevel}</td>
-                <td>${r.word}</td>
-                <td style="color:green"><b>${r.status}</b></td>
-                <td>${r.time}</td>
-            </tr>`;
+        let html = `<table style="width:100%; border-collapse:collapse;"><tr><th>ชื่อ</th><th>ระดับ</th><th>คำ</th><th>ผล</th></tr>`;
+        allResults.filter(r => r.student === currentStudent).reverse().forEach(r => {
+            html += `<tr><td style="border:1px solid #ddd; padding:8px;">${r.student}</td><td style="border:1px solid #ddd; padding:8px;">${r.rLevel}</td><td style="border:1px solid #ddd; padding:8px;">${r.word}</td><td style="border:1px solid #ddd; padding:8px; color:green;">${r.status}</td></tr>`;
         });
         html += `</table>`;
         holder.innerHTML = html;
     }
 
     function exportToCSV() {
-        if(allResults.length === 0) { alert("ไม่มีข้อมูลให้ดาวน์โหลด"); return; }
-        
-        let csv = "\ufeffชื่อ,ชั้น,ระดับ,คำถาม,ผลการอ่าน,เวลา\n";
-        allResults.forEach(r => {
-            csv += `${r.student},${r.room},${r.rLevel},${r.word},${r.status},${r.time}\n`;
-        });
-
+        if(allResults.length === 0) return;
+        let csv = "\ufeffชื่อ,ชั้น,ระดับ,คำถาม,ผล,เวลา\n";
+        allResults.forEach(r => { csv += `${r.student},${r.room},${r.rLevel},${r.word},${r.status},${r.time}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", `ผลการอ่าน_โรงเรียนวัดหนองโพรง.csv`);
-        document.body.appendChild(link);
+        link.download = `สรุปผลการอ่าน.csv`;
         link.click();
-        document.body.removeChild(link);
     }
 </script>
 
