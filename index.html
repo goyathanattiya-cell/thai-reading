@@ -3,56 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEARING SCHOOL - ดึงรายชื่ออัตโนมัติ</title>
+    <title>HEARING SCHOOL v2.0 - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #68D391; --danger: #FC8181; --bg: #E6FFFA; --card-bg: #FFFFFF; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: var(--card-bg); padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; border: 5px solid white; }
-        h2 { font-family: 'Mitr', sans-serif; color: #2D3748; margin-bottom: 5px; }
-        .sub-title { color: #718096; margin-bottom: 25px; font-size: 0.9rem; }
+        :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #48BB78; --danger: #F56565; --bg: #F0FFF4; --card-bg: #FFFFFF; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: var(--card-bg); padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 650px; width: 100%; text-align: center; border: 4px solid white; }
+        
         .screen { display: none; }
-        .active { display: block; }
-        select, input { width: 90%; padding: 15px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 15px; font-size: 18px; font-family: 'Sarabun'; }
-        .btn { border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; width: 100%; margin: 10px 0; font-family: 'Mitr'; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Dashboard Styles */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #fff; border: 1px solid #E2E8F0; padding: 10px; border-radius: 15px; text-align: center; }
+        .stat-num { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 12px; color: #718096; }
+
+        select, input { width: 90%; padding: 12px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 16px; font-family: 'Sarabun'; }
+        .btn { border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; width: 100%; margin: 8px 0; font-family: 'Mitr'; }
         .btn-start { background-color: var(--primary); }
         .btn-speak { background-color: var(--secondary); font-size: 22px; }
         .btn-pass { background-color: var(--success); }
-        .btn-export { background-color: #4A5568; }
+        .btn-fail { background-color: var(--danger); }
+        
         .word-card { background: #F7FAFC; padding: 40px 20px; border-radius: 20px; margin: 20px 0; border: 3px dashed #CBD5E0; }
-        #wordDisplay { font-size: 72px; color: #2D3748; margin: 0; font-weight: bold; }
-        .badge { display: inline-block; padding: 8px 20px; border-radius: 50px; font-weight: bold; margin-bottom: 10px; background: #E9D8FD; color: #6B46C1; }
-        #resultText { min-height: 50px; margin: 15px 0; padding: 15px; border-radius: 15px; font-weight: bold; }
-        .student-info { display: flex; justify-content: space-between; background: #EDF2F7; padding: 10px 20px; border-radius: 50px; font-size: 14px; margin-bottom: 20px; }
-        .loading-text { color: var(--secondary); font-weight: bold; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #wordDisplay { font-size: 80px; color: #2D3748; margin: 0; font-weight: bold; }
+        .badge { display: inline-block; padding: 6px 15px; border-radius: 50px; font-weight: bold; margin-bottom: 10px; background: #E9D8FD; color: #6B46C1; }
+        
+        #resultText { min-height: 50px; margin: 15px 0; padding: 15px; border-radius: 15px; font-weight: bold; background: #EDF2F7; }
+        .student-info { display: flex; justify-content: space-between; background: #EDF2F7; padding: 10px 20px; border-radius: 50px; font-size: 14px; margin-bottom: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 15px; }
+        th, td { border-bottom: 1px solid #E2E8F0; padding: 10px; text-align: left; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- หน้า 1: ตั้งค่าและรายชื่อ -->
+    <!-- หน้า 1: ตั้งค่าและ Dashboard -->
     <div id="setupScreen" class="screen active">
         <h2>🏫 HEARING SCHOOL</h2>
-        <p class="sub-title">พัฒนาการอ่านรายบุคคล โรงเรียนวัดหนองโพรง</p>
+        <p style="color:#718096; margin-top:-10px;">โรงเรียนวัดหนองโพรง</p>
         
-        <div style="text-align:left; padding:0 20px;">
-            <label><b>1. ระบุชั้นเรียน:</b></label>
-            <input type="text" id="roomInput" placeholder="เช่น ป.1/1">
-            
-            <label><b>2. เลือกชื่อนักเรียน:</b></label>
-            <div id="loadingStatus" class="loading-text">🔄 กำลังโหลดรายชื่อจากฐานข้อมูล...</div>
-            <select id="studentSelect">
-                <option value="">-- กำลังโหลดข้อมูล --</option>
+        <!-- Dashboard สรุปผลภาพรวม -->
+        <div class="dashboard" id="dashboardSummary">
+            <div class="stat-card"><div class="stat-num" id="countR1">0</div><div class="stat-label">ระดับ R1</div></div>
+            <div class="stat-card"><div class="stat-num" id="countR2">0</div><div class="stat-label">ระดับ R2</div></div>
+            <div class="stat-card"><div class="stat-num" id="countR3-5">0</div><div class="stat-label">ระดับ R3-5</div></div>
+        </div>
+
+        <div style="text-align:left; padding:0 10px;">
+            <label><b>1. เลือกชื่อนักเรียน:</b></label>
+            <select id="studentSelect" onchange="updateStudentProgress()">
+                <option value="">-- กำลังโหลดรายชื่อ --</option>
             </select>
-            <small style="color: #A0AEC0;">*หากไม่มีชื่อ ให้เพิ่มใน Google Sheets แล้วรีเฟรชหน้านี้</small>
+            <div id="progressHint" style="font-size:13px; color:var(--primary); margin:5px 0 15px 5px;"></div>
+
+            <label><b>2. ระบุชั้นเรียน:</b></label>
+            <input type="text" id="roomInput" placeholder="เช่น ป.1/1">
         </div>
         
-        <button class="btn btn-start" onclick="startApp()" id="startBtn" disabled>รอโหลดข้อมูลสักครู่... 🚀</button>
-        <button class="btn btn-export" onclick="exportToCSV()">ดาวน์โหลดไฟล์สรุปคะแนน (CSV) 📥</button>
+        <button class="btn btn-start" onclick="startApp()" id="startBtn" disabled>รอโหลดข้อมูลสักครู่...</button>
+        <button class="btn" style="background:#4A5568" onclick="showSummary()">📊 ดูรายงานผลนักเรียนทุกคน</button>
     </div>
 
-    <!-- หน้า 2: หน้าจอฝึกอ่าน -->
+    <!-- หน้า 2: หน้าจอทดสอบ -->
     <div id="practiceScreen" class="screen">
         <div class="student-info">
             <span>👤 <b id="displayName"></b></span>
@@ -60,27 +76,30 @@
         </div>
         <div id="rLevelBadge" class="badge">R1</div>
         <div class="word-card">
-            <p style="margin:0; color:#A0AEC0;">คำฝึกอ่านที่ <span id="wordNumber">1</span></p>
             <h1 id="wordDisplay">ก</h1>
         </div>
-        <div id="resultText">กดปุ่มสีส้มเพื่อเริ่มอ่าน</div>
+        <div id="resultText">เตรียมความพร้อม...</div>
         <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
-        <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ครูให้ผ่าน (ข้ามคำนี้)</button>
-        <button class="btn" style="background:#B794F4" onclick="location.reload()">🏠 กลับหน้าหลัก</button>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ผ่าน</button>
+            <button class="btn btn-fail" onclick="handleStruggle()">❌ ติดขัด</button>
+        </div>
+        <button class="btn" style="background:#CBD5E0; color:#4A5568;" onclick="backToMain()">🏠 เปลี่ยนนักเรียน</button>
     </div>
 
-    <!-- หน้า 3: รายงานผล -->
+    <!-- หน้า 3: รายงานภาพรวม -->
     <div id="reportPanel" class="screen">
-        <h3>สรุปผลการประเมิน</h3>
-        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;"></div>
-        <button class="btn btn-start" onclick="location.reload()">🏠 เริ่มต้นใหม่ / เปลี่ยนนักเรียน</button>
+        <h3>📊 สารสนเทศการอ่านล่าสุด</h3>
+        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto; text-align:left;"></div>
+        <button class="btn btn-start" onclick="backToMain()">🏠 กลับหน้าหลัก</button>
     </div>
 </div>
 
 <script>
-    // *** สำคัญ: นำ URL ที่ได้จาก Google Apps Script มาวางตรงนี้ ***
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwXQvQldwm7amtDuE0G-tZZtynUheL4b9vLKksw1cxrchtWvxca8jbrGd8d3iLds8xD/exec";
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxRV7jBazND8AJJMM-LkekTPXCaeFV9hy8IPpnqpKpRwq1swHMBdjUM-L-wiSH-pdSD/exec";
 
+    // รายการคำและคำแนะนำ (ขยายความเข้มข้นขึ้น)
     const wordList = [
         { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
         { word: "ค", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
@@ -144,119 +163,76 @@
         { word: "มันพยายามจะจับวัวกิน", r: "R5", desc: "อ่านข้อความ", advice: "ฝึกอ่านประโยคสั้นๆ ในชีวิตประจำวัน" }
     ];
 
+    let allStudents = [];
+    let lastStatusMap = {};
     let currentStudent = "";
-    let currentRoom = "";
     let currentIndex = 0;
-    let allResults = JSON.parse(localStorage.getItem('ReadingResults')) || [];
 
-    // --- ฟังก์ชันดึงรายชื่อจาก Google Sheets อัตโนมัติ ---
-javascript
-window.onload = function() {
+    // --- โหลดข้อมูลเริ่มต้น ---
+    window.onload = loadData;
 
-    const select = document.getElementById("studentSelect");
-    const loading = document.getElementById("loadingStatus");
-    const startBtn = document.getElementById("startBtn");
-
-    loading.innerText =
-        "🔄 กำลังโหลดรายชื่อจาก Google Sheets...";
-
-    fetch(GOOGLE_URL)
-
-        .then(function(response) {
-
-            if (!response.ok) {
-                throw new Error(
-                    "HTTP Error " + response.status
-                );
-            }
-
-            return response.json();
-        })
-
-        .then(function(result) {
-
-            console.log(
-                "ข้อมูลจาก Google Sheets:",
-                result
-            );
-
-            // ตรวจสอบสถานะจาก Google Apps Script
-            if (!result.success) {
-                throw new Error(result.error);
-            }
-
-            const names = result.names;
-
-            // ล้างรายชื่อเดิม
-            select.innerHTML =
-                '<option value="">-- เลือกชื่อนักเรียน --</option>';
-
-            // นำรายชื่อมาใส่ในช่องเลือก
-            names.forEach(function(name) {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = name;
-                option.textContent = name;
-
-                select.appendChild(option);
+    function loadData() {
+        fetch(GOOGLE_URL)
+            .then(res => res.json())
+            .then(data => {
+                allStudents = data.names;
+                lastStatusMap = data.lastStatus;
+                populateDropdown();
+                updateDashboard();
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').innerText = 'เริ่มการทดสอบ 🚀';
             });
+    }
 
-            // โหลดเสร็จแล้ว
-            loading.style.display = "none";
-
-            // ถ้ามีรายชื่อ
-            if (names.length > 0) {
-
-                startBtn.disabled = false;
-                startBtn.innerText =
-                    "เริ่มการทดสอบ 🚀";
-
-            } else {
-
-                loading.style.display = "block";
-
-                loading.innerText =
-                    "⚠️ ไม่พบรายชื่อนักเรียนใน Google Sheets";
-
-            }
-
-        })
-
-        .catch(function(error) {
-
-            console.error(
-                "เกิดข้อผิดพลาด:",
-                error
-            );
-
-            loading.style.display = "block";
-
-            loading.innerText =
-                "❌ โหลดรายชื่อไม่สำเร็จ: " +
-                error.message;
-
-            startBtn.disabled = true;
-
-            startBtn.innerText =
-                "โหลดข้อมูลไม่สำเร็จ";
-
+    function populateDropdown() {
+        const select = document.getElementById('studentSelect');
+        select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+        allStudents.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.innerText = name + (lastStatusMap[name] ? ` (${lastStatusMap[name].level})` : " (ใหม่)");
+            select.appendChild(opt);
         });
-};
+    }
 
-    function showScreen(screenId) {
+    function updateStudentProgress() {
+        const name = document.getElementById('studentSelect').value;
+        const hint = document.getElementById('progressHint');
+        if (lastStatusMap[name]) {
+            currentIndex = parseInt(lastStatusMap[name].wordIndex) + 1;
+            if (currentIndex >= wordList.length) currentIndex = 0; // ถ้าจบแล้วให้เริ่มใหม่
+            hint.innerText = `อ่านถึงล่าสุด: ${wordList[currentIndex].word} (ระดับ ${wordList[currentIndex].r})`;
+        } else {
+            currentIndex = 0;
+            hint.innerText = "ยังไม่เคยทดสอบ เริ่มจากคำแรก";
+        }
+    }
+
+    function updateDashboard() {
+        let r1=0, r2=0, r35=0;
+        Object.values(lastStatusMap).forEach(v => {
+            if (v.level === "R1") r1++;
+            else if (v.level === "R2") r2++;
+            else r35++;
+        });
+        document.getElementById('countR1').innerText = r1;
+        document.getElementById('countR2').innerText = r2;
+        document.getElementById('countR3-5').innerText = r35;
+    }
+
+    // --- ฟังก์ชันการทดสอบ ---
+    function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+        document.getElementById(id).classList.add('active');
     }
 
     function startApp() {
         currentStudent = document.getElementById("studentSelect").value;
         currentRoom = document.getElementById("roomInput").value;
-        if (!currentStudent || !currentRoom) { alert("กรุณาเลือกชื่อนักเรียนและใส่ชั้นเรียนครับ"); return; }
+        if (!currentStudent || !currentRoom) return alert("กรุณาเลือกชื่อและระบุชั้นเรียน");
+        
         document.getElementById("displayName").innerText = currentStudent;
         document.getElementById("displayRoom").innerText = currentRoom;
-        currentIndex = 0;
         updateDisplay();
         showScreen('practiceScreen');
     }
@@ -264,10 +240,9 @@ window.onload = function() {
     function updateDisplay() {
         const item = wordList[currentIndex];
         document.getElementById("wordDisplay").innerText = item.word;
-        document.getElementById("wordNumber").innerText = currentIndex + 1;
         document.getElementById("rLevelBadge").innerText = `${item.r}: ${item.desc}`;
-        document.getElementById("resultText").innerText = "พร้อมฟังแล้วครับ...";
-        document.getElementById("resultText").style.background = "#F7FAFC";
+        document.getElementById("resultText").innerText = "กดปุ่มส้มแล้วอ่านออกเสียง";
+        document.getElementById("resultText").style.background = "#EDF2F7";
     }
 
     function startListening() {
@@ -275,56 +250,84 @@ window.onload = function() {
         recognition.lang = "th-TH";
         document.getElementById("resultText").innerText = "🎤 กำลังฟัง...";
         recognition.start();
+        
         recognition.onresult = function(event) {
             const spoken = event.results[0][0].transcript;
-            const target = wordList[currentIndex].word;
-            if (spoken.includes(target) || target.includes(spoken)) {
+            if (spoken.includes(wordList[currentIndex].word)) {
                 handleSuccess(spoken);
             } else {
-                document.getElementById("resultText").innerText = `❌ ยังไม่ชัด (คุณอ่านว่า: ${spoken})`;
+                document.getElementById("resultText").innerText = `❌ ยังไม่ชัด (ได้ยินว่า: ${spoken})`;
                 document.getElementById("resultText").style.background = "#FED7D7";
             }
         };
     }
 
     function handleSuccess(spoken) {
-        const item = wordList[currentIndex];
-        document.getElementById("resultText").innerText = `✅ ถูกต้อง! (${spoken})`;
+        saveData("ผ่าน", "ชัดเจน");
+        document.getElementById("resultText").innerText = "✅ ถูกต้อง!";
         document.getElementById("resultText").style.background = "#C6F6D5";
-        saveData(item, "ผ่าน");
+        
         setTimeout(() => {
-            if (currentIndex < wordList.length - 1) { currentIndex++; updateDisplay(); }
-            else { alert("เก่งมาก! ทดสอบครบแล้ว"); toggleReport(); }
+            if (currentIndex < wordList.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            } else {
+                alert("ยินดีด้วย! ทดสอบจนถึงคำสุดท้ายแล้ว");
+                backToMain();
+            }
         }, 1500);
     }
 
-    function saveData(item, status) {
-        const data = { student: currentStudent, room: currentRoom, word: item.word, rLevel: item.r, status: status };
-        allResults.push({ ...data, time: new Date().toLocaleString('th-TH') });
-        localStorage.setItem('ReadingResults', JSON.stringify(allResults));
+    function handleStruggle() {
+        const item = wordList[currentIndex];
+        const advice = item.advice;
+        alert(`ระดับ: ${item.r}\nข้อแนะนำ: ${advice}`);
+        saveData("ควรปรับปรุง", advice);
+        backToMain();
+    }
+
+    function saveData(status, advice) {
+        const item = wordList[currentIndex];
+        const data = {
+            student: currentStudent,
+            room: currentRoom,
+            word: item.word,
+            rLevel: item.r,
+            status: status,
+            wordIndex: currentIndex,
+            advice: advice
+        };
+        // อัปเดตในเครื่องทันที
+        lastStatusMap[currentStudent] = { level: item.r, wordIndex: currentIndex };
+        updateDashboard();
+        
         fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
-    function toggleReport() {
+    function backToMain() {
+        // ล้างค่าตัวแปรเดิมเพื่อป้องกันข้อมูลค้าง
+        currentStudent = "";
+        currentIndex = 0;
+        document.getElementById("studentSelect").value = "";
+        document.getElementById("progressHint").innerText = "";
+        loadData(); // รีโหลดข้อมูลใหม่จาก Google Sheets
+        showScreen('setupScreen');
+    }
+
+    function showSummary() {
         showScreen('reportPanel');
         const holder = document.getElementById("statsTableHolder");
-        let html = `<table style="width:100%; border-collapse:collapse;"><tr><th>ชื่อ</th><th>ระดับ</th><th>คำ</th><th>ผล</th></tr>`;
-        allResults.filter(r => r.student === currentStudent).reverse().forEach(r => {
-            html += `<tr><td style="border:1px solid #ddd; padding:8px;">${r.student}</td><td style="border:1px solid #ddd; padding:8px;">${r.rLevel}</td><td style="border:1px solid #ddd; padding:8px;">${r.word}</td><td style="border:1px solid #ddd; padding:8px; color:green;">${r.status}</td></tr>`;
+        let html = `<table><tr><th>ชื่อนักเรียน</th><th>ระดับล่าสุด</th><th>สถานะ</th></tr>`;
+        allStudents.forEach(name => {
+            const last = lastStatusMap[name];
+            html += `<tr>
+                <td>${name}</td>
+                <td>${last ? last.level : "-"}</td>
+                <td>${last ? "ประเมินแล้ว" : "ยังไม่ได้ทดสอบ"}</td>
+            </tr>`;
         });
         html += `</table>`;
         holder.innerHTML = html;
-    }
-
-    function exportToCSV() {
-        if(allResults.length === 0) return;
-        let csv = "\ufeffชื่อ,ชั้น,ระดับ,คำถาม,ผล,เวลา\n";
-        allResults.forEach(r => { csv += `${r.student},${r.room},${r.rLevel},${r.word},${r.status},${r.time}\n`; });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `สรุปผลการอ่าน.csv`;
-        link.click();
     }
 </script>
 
