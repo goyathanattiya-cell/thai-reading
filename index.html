@@ -79,7 +79,7 @@
 
 <script>
     // *** สำคัญ: นำ URL ที่ได้จาก Google Apps Script มาวางตรงนี้ ***
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzcAbtAvFkJ2fteiImhaXOx6V_Wm1FnC5rUANrRnYp0kvJFMpF10SJ_Yg0Y6hN_lLy-/exec";
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbx_iqZQXO4LbvRrX29DdBAd0KJdM5i_ZsJcBDu8TCeVrXRf3lNq5CALSN91pLFlj05O/exec";
 
     const wordList = [
         { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
@@ -150,27 +150,100 @@
     let allResults = JSON.parse(localStorage.getItem('ReadingResults')) || [];
 
     // --- ฟังก์ชันดึงรายชื่อจาก Google Sheets อัตโนมัติ ---
-    window.onload = function() {
-        fetch(GOOGLE_URL)
-            .then(res => res.json())
-            .then(names => {
-                const select = document.getElementById('studentSelect');
-                select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
-                names.forEach(name => {
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    opt.innerText = name;
-                    select.appendChild(opt);
-                });
-                document.getElementById('loadingStatus').style.display = 'none';
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('startBtn').innerText = 'เริ่มการทดสอบ 🚀';
-            })
-            .catch(err => {
-                document.getElementById('loadingStatus').innerText = "❌ โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบลิงก์ Script";
-                console.error(err);
+javascript
+window.onload = function() {
+
+    const select = document.getElementById("studentSelect");
+    const loading = document.getElementById("loadingStatus");
+    const startBtn = document.getElementById("startBtn");
+
+    loading.innerText =
+        "🔄 กำลังโหลดรายชื่อจาก Google Sheets...";
+
+    fetch(GOOGLE_URL)
+
+        .then(function(response) {
+
+            if (!response.ok) {
+                throw new Error(
+                    "HTTP Error " + response.status
+                );
+            }
+
+            return response.json();
+        })
+
+        .then(function(result) {
+
+            console.log(
+                "ข้อมูลจาก Google Sheets:",
+                result
+            );
+
+            // ตรวจสอบสถานะจาก Google Apps Script
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
+            const names = result.names;
+
+            // ล้างรายชื่อเดิม
+            select.innerHTML =
+                '<option value="">-- เลือกชื่อนักเรียน --</option>';
+
+            // นำรายชื่อมาใส่ในช่องเลือก
+            names.forEach(function(name) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = name;
+                option.textContent = name;
+
+                select.appendChild(option);
             });
-    };
+
+            // โหลดเสร็จแล้ว
+            loading.style.display = "none";
+
+            // ถ้ามีรายชื่อ
+            if (names.length > 0) {
+
+                startBtn.disabled = false;
+                startBtn.innerText =
+                    "เริ่มการทดสอบ 🚀";
+
+            } else {
+
+                loading.style.display = "block";
+
+                loading.innerText =
+                    "⚠️ ไม่พบรายชื่อนักเรียนใน Google Sheets";
+
+            }
+
+        })
+
+        .catch(function(error) {
+
+            console.error(
+                "เกิดข้อผิดพลาด:",
+                error
+            );
+
+            loading.style.display = "block";
+
+            loading.innerText =
+                "❌ โหลดรายชื่อไม่สำเร็จ: " +
+                error.message;
+
+            startBtn.disabled = true;
+
+            startBtn.innerText =
+                "โหลดข้อมูลไม่สำเร็จ";
+
+        });
+};
 
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
