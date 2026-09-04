@@ -3,134 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEARING SCHOOL v2.0 - Dashboard</title>
+    <title>HEARING SCHOOL v3.0 - Professional Ed-Admin Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/button/all.min.css">
     <style>
-        :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #48BB78; --danger: #F56565; --bg: #F0FFF4; --card-bg: #FFFFFF; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: var(--card-bg); padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 650px; width: 100%; text-align: center; border: 4px solid white; }
+        :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #48BB78; --danger: #F56565; --bg: #F0FFF4; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; position: relative; overflow: hidden; }
         
+        /* Animation Effects */
         .screen { display: none; }
-        .active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Dashboard Styles */
+        /* Feedback Icons */
+        .feedback-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 150px; z-index: 100; display: none; pointer-events: none; }
+        .firework { color: #FFD700; text-shadow: 0 0 20px gold; }
+        .cross { color: var(--danger); }
+
+        /* Visual Cues */
+        .hand-pointer { position: absolute; font-size: 40px; color: var(--secondary); animation: point 1s infinite; display: none; }
+        @keyframes point { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* Dashboard & Cards */
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #fff; border: 1px solid #E2E8F0; padding: 10px; border-radius: 15px; text-align: center; }
-        .stat-num { font-size: 24px; font-weight: bold; color: var(--primary); }
-        .stat-label { font-size: 12px; color: #718096; }
+        .stat-card { background: #fff; border: 1px solid #E2E8F0; padding: 10px; border-radius: 15px; }
+        .word-card { background: #F7FAFC; padding: 30px 10px; border-radius: 20px; margin: 15px 0; border: 3px dashed #CBD5E0; position: relative; }
+        
+        /* Inputs & Buttons */
+        select, input, textarea { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 16px; }
+        .btn { border: none; padding: 15px 25px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin: 5px 0; transition: 0.3s; font-family: 'Mitr'; }
+        .btn-start { background: var(--primary); }
+        .btn-speak { background: var(--secondary); font-size: 24px; position: relative; }
+        .btn-resource { background: var(--accent); font-size: 14px; padding: 8px; }
 
-        select, input { width: 90%; padding: 12px; margin: 10px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 16px; font-family: 'Sarabun'; }
-        .btn { border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; width: 100%; margin: 8px 0; font-family: 'Mitr'; }
-        .btn-start { background-color: var(--primary); }
-        .btn-speak { background-color: var(--secondary); font-size: 22px; }
-        .btn-pass { background-color: var(--success); }
-        .btn-fail { background-color: var(--danger); }
-        
-        .word-card { background: #F7FAFC; padding: 40px 20px; border-radius: 20px; margin: 20px 0; border: 3px dashed #CBD5E0; }
-        #wordDisplay { font-size: 80px; color: #2D3748; margin: 0; font-weight: bold; }
-        .badge { display: inline-block; padding: 6px 15px; border-radius: 50px; font-weight: bold; margin-bottom: 10px; background: #E9D8FD; color: #6B46C1; }
-        
-        #resultText { min-height: 50px; margin: 15px 0; padding: 15px; border-radius: 15px; font-weight: bold; background: #EDF2F7; }
-        .student-info { display: flex; justify-content: space-between; background: #EDF2F7; padding: 10px 20px; border-radius: 50px; font-size: 14px; margin-bottom: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 15px; }
-        th, td { border-bottom: 1px solid #E2E8F0; padding: 10px; text-align: left; }
+        /* Special Needs Section */
+        .referral-box { background: #FFF5F5; border: 1px solid #FEB2B2; padding: 15px; border-radius: 15px; margin-top: 15px; text-align: left; }
+        .resource-link { color: #6B46C1; text-decoration: underline; cursor: pointer; display: block; margin: 5px 0; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- หน้า 1: ตั้งค่าและ Dashboard -->
+<div class="container" id="mainContainer">
+    <!-- Feedback Elements -->
+    <div id="fireworkIcon" class="feedback-overlay firework">🎆</div>
+    <div id="crossIcon" class="feedback-overlay cross">❌</div>
+    <div id="handPointer" class="hand-pointer">👇</div>
+
+    <!-- หน้า 1: Setup & Admin Dashboard -->
     <div id="setupScreen" class="screen active">
-        <h2>🏫 HEARING SCHOOL</h2>
-        <p style="color:#718096; margin-top:-10px;">โรงเรียนวัดหนองโพรง</p>
-        
-        <!-- Dashboard สรุปผลภาพรวม -->
+        <h2>🏫 HEARING SCHOOL v3.0</h2>
         <div class="dashboard" id="dashboardSummary">
-            <div class="stat-card"><div class="stat-num" id="countR1">0</div><div class="stat-label">ระดับ R1</div></div>
-            <div class="stat-card"><div class="stat-num" id="countR2">0</div><div class="stat-label">ระดับ R2</div></div>
-            <div class="stat-card"><div class="stat-num" id="countR3-5">0</div><div class="stat-label">ระดับ R3-5</div></div>
+            <div class="stat-card"><div style="font-size:20px; font-weight:bold;" id="countR1">0</div><small>R1</small></div>
+            <div class="stat-card"><div style="font-size:20px; font-weight:bold;" id="countR2">0</div><small>R2</small></div>
+            <div class="stat-card"><div style="font-size:20px; font-weight:bold;" id="countOther">0</div><small>R3-5</small></div>
         </div>
 
-        <div style="text-align:left; padding:0 10px;">
-            <label><b>1. เลือกชื่อนักเรียน:</b></label>
-            <select id="studentSelect" onchange="updateStudentProgress()">
+        <div style="text-align:left; padding:10px;">
+            <label><b>1. เลือกนักเรียน:</b></label>
+            <select id="studentSelect" onchange="updateProgressHint()">
                 <option value="">-- กำลังโหลดรายชื่อ --</option>
             </select>
-            <div id="progressHint" style="font-size:13px; color:var(--primary); margin:5px 0 15px 5px;"></div>
-
-            <label><b>2. ระบุชั้นเรียน:</b></label>
-            <input type="text" id="roomInput" placeholder="เช่น ป.1/1">
+            <div id="progressHint" style="font-size:12px; color:var(--primary); min-height:15px;"></div>
+            
+            <label><b>2. ชั้นเรียน:</b></label>
+            <input type="text" id="roomInput" placeholder="ป.1/...">
         </div>
-        
-        <button class="btn btn-start" onclick="startApp()" id="startBtn" disabled>รอโหลดข้อมูลสักครู่...</button>
-        <button class="btn" style="background:#4A5568" onclick="showSummary()">📊 ดูรายงานผลนักเรียนทุกคน</button>
+
+        <button class="btn btn-start" onclick="startTestSequence()" id="startBtn" disabled>รอข้อมูล... 🚀</button>
+        <button class="btn" style="background:#4A5568" onclick="showSummary()">📊 รายงานผล & นิเทศ</button>
     </div>
 
-    <!-- หน้า 2: หน้าจอทดสอบ -->
-    <div id="practiceScreen" class="screen">
-        <div class="student-info">
-            <span>👤 <b id="displayName"></b></span>
-            <span>🏫 <b id="displayRoom"></b></span>
-        </div>
-        <div id="rLevelBadge" class="badge">R1</div>
+    <!-- หน้า 2: โหมดสอนตัวอย่าง (Tutorial) -->
+    <div id="tutorialScreen" class="screen">
+        <div class="badge" id="tutLevelBadge" style="background:#E9D8FD; padding:5px 15px; border-radius:50px;">ระดับ R1</div>
+        <h3 id="tutTitle">แนะนำวิธีการอ่าน</h3>
+        <p id="tutInstruction" style="color:#718096; font-size:14px;"></p>
         <div class="word-card">
-            <h1 id="wordDisplay">ก</h1>
+            <h1 id="tutWordDisplay" style="font-size:80px; margin:0;">ตัวอย่าง</h1>
+            <p id="tutReadingHint" style="color:var(--accent); font-weight:bold;"></p>
         </div>
-        <div id="resultText">เตรียมความพร้อม...</div>
-        <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
-        
-        <div style="display:flex; gap:10px;">
-            <button class="btn btn-pass" onclick="handleSuccess('ครูให้ผ่าน')">✔️ ผ่าน</button>
-            <button class="btn btn-fail" onclick="handleStruggle()">❌ ติดขัด</button>
-        </div>
-        <button class="btn" style="background:#CBD5E0; color:#4A5568;" onclick="backToMain()">🏠 เปลี่ยนนักเรียน</button>
+        <button class="btn btn-speak" onclick="playSampleAudio()">🔊 ฟังเสียงตัวอย่าง</button>
+        <button class="btn btn-start" style="margin-top:20px;" onclick="startActualLevel()">เข้าใจแล้ว เริ่มอ่านจริง 🚀</button>
     </div>
 
-    <!-- หน้า 3: รายงานภาพรวม -->
+    <!-- หน้า 3: หน้าจอฝึกอ่านจริง -->
+    <div id="practiceScreen" class="screen">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+            <span id="displayName"></span>
+            <span id="displayLevelCount"></span>
+        </div>
+        <div id="rLevelBadge" class="badge" style="background:#E9D8FD; padding:5px 15px; border-radius:50px;"></div>
+        
+        <div class="word-card">
+            <h1 id="wordDisplay"></h1>
+            <div id="resourceBtnArea"></div>
+        </div>
+
+        <div id="resultText" style="margin:10px 0; font-weight:bold;">กดปุ่มเพื่อเริ่มอ่าน</div>
+        <button class="btn btn-speak" id="speakBtn" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn" style="background:var(--success)" onclick="handleManualResult(true)">✔️ ผ่าน</button>
+            <button class="btn" style="background:var(--danger)" onclick="handleManualResult(false)">❌ ติดขัด</button>
+        </div>
+        <button class="btn btn-resource" onclick="toggleCoachingForm()">📝 บันทึกการนิเทศ/ส่งต่อ</button>
+    </div>
+
+    <!-- ส่วนนิเทศและส่งต่อ (Popup/Toggle) -->
+    <div id="coachingPanel" style="display:none; text-align:left; padding:15px; background:#EDF2F7; border-radius:15px; margin-top:10px;">
+        <h4>📋 บันทึกการนิเทศ & ช่วยเหลือ</h4>
+        <small>วิธีที่ครูใช้:</small>
+        <input type="text" id="coachingMethod" placeholder="เช่น เพื่อนช่วยเพื่อน, ใช้สื่อเพลง">
+        <small>ผลการนิเทศ/ปัญหา:</small>
+        <textarea id="coachingNote" rows="2"></textarea>
+        
+        <div class="referral-box">
+            <label style="color:var(--danger); font-weight:bold;">
+                <input type="checkbox" id="referralFlag"> ⚠️ พบสัญญาณล่าช้า (ส่งต่อแพทย์พัฒนาการ)
+            </label>
+        </div>
+        <button class="btn" style="background:#4A5568" onclick="toggleCoachingForm()">ปิด</button>
+    </div>
+
+    <!-- หน้า 4: รายงานผล -->
     <div id="reportPanel" class="screen">
-        <h3>📊 สารสนเทศการอ่านล่าสุด</h3>
-        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto; text-align:left;"></div>
-        <button class="btn btn-start" onclick="backToMain()">🏠 กลับหน้าหลัก</button>
+        <h3>📊 สารสนเทศรายบุคคล</h3>
+        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;"></div>
+        <button class="btn btn-start" onclick="location.reload()">🏠 กลับหน้าแรก</button>
     </div>
 </div>
 
 <script>
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxRV7jBazND8AJJMM-LkekTPXCaeFV9hy8IPpnqpKpRwq1swHMBdjUM-L-wiSH-pdSD/exec";
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbz1LF-IAFBuEikmi0OaEOHeEibGsmFCggLoFYuJTSp4y4QzkmjmaRaruCnkUO-P49_2/exec";
 
-    // รายการคำและคำแนะนำ (ขยายความเข้มข้นขึ้น)
-    const wordList = [
-        { word: "ก", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ค", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ต", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ฒ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ฬ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ถ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ซ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ฝ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "ส", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "อ", r: "R1", desc: "จดจำอักษร", advice: "ฝึกท่องพยัญชนะ ก-ฮ และสระ" },
-        { word: "อะ", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "อี", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "อู", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "แอะ", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "เอีย", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "เอือ", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "อัว", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "เอา", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "เอาะ", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "ไอ", r: "R1", desc: "จดจำอักษร", advice: "เน้นการจำรูปสระ" },
-        { word: "จะ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงสั้น" },
-        { word: "ขา", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
-        { word: "แวะ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงสั้น" },
-        { word: "ฟู", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
-        { word: "ริ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงสั้น" },
-        { word: "เรือ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
-        { word: "ดุ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงสั้น" },
-        { word: "มือ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
-        { word: "เละ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงสั้น" },
-        { word: "ไป", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "ฝึกแจกลูกคำสระเสียงยาว" },
+    // จัดกลุ่มคำตามระดับ R
+    const rawData = [
+        { word: "ก", r: "R1", desc: "จดจำพยัญชนะ", sample: "กอ-ไก่", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "จ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ค", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ต", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ฒ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ฬ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ถ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ซ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ฝ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "ส", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "อ", r: "R1", desc: "จดจำอักษร", advice: "R1: ใช้เพลงสระ เพลงพยัญชนะ" },
+        { word: "อะ", r: "R1", desc: "จดจำสระ", sample: "สระ-อะ", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "อา", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "อี", r: "R1", desc: "จดจำอักษร", aadvice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "อู", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "แอะ", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "เอีย", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "เอือ", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "อัว", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "เอา", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "เอาะ", r: "R1", desc: "จดจำอักษร", advice: "R1: ฝึกแจกลูกด้วยสื่อสี" },
+        { word: "จะ", r: "R2", desc: "ผสมสระเสียงสั้น", sample: "จอ-อะ-จะ", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ปะ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ขา", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "แวะ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ฟู", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ริ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "เรือ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ดุ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "มือ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "เละ", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "ไป", r: "R2", desc: "ผสมคำพื้นฐาน", advice: "R2: ชี้พยัญชนะตัวแรกที่ออกเสียง" },
+        { word: "บ้าน", r: "R3", desc: "คำสะกดตรงมาตรา", sample: "บอ-อา-นอ-บาน-ไม้โท-บ้าน", advice: "R3: พยัญชนะต้นคงที่ เปลี่ยนสระ" },
+        { word: "กล้า", r: "R3", desc: "อักษรควบ", sample: "กอ-ลอ-อา-กลา-ไม้โท-กล้า", advice: "R3: เน้นพยัญชนะควบ ร ล ว" },
+        { word: "นักเรียน", r: "R4", desc: "คำหลายพยางค์", sample: "นอ-อะ-กอ-นัก-รอ-เอีย-นอ-เรียน", advice: "R4: ใช้เพลงและแบบฝึกอักษรนำ/ไม่ตรงมาตรา" }
         { word: "กล้า", r: "R3", desc: "คำซับซ้อน", advice: "ฝึกอักษรควบและวรรณยุกต์" },
         { word: "ครัว", r: "R3", desc: "คำซับซ้อน", advice: "ฝึกอักษรควบและวรรณยุกต์" },
         { word: "พริก", r: "R3", desc: "คำซับซ้อน", advice: "ฝึกอักษรควบและวรรณยุกต์" },
@@ -165,169 +208,203 @@
 
     let allStudents = [];
     let lastStatusMap = {};
+    let currentLevelWords = [];
     let currentStudent = "";
     let currentIndex = 0;
+    let currentR = "";
 
-    // --- โหลดข้อมูลเริ่มต้น ---
-    window.onload = loadData;
-
-    function loadData() {
-        fetch(GOOGLE_URL)
-            .then(res => res.json())
-            .then(data => {
-                allStudents = data.names;
-                lastStatusMap = data.lastStatus;
-                populateDropdown();
-                updateDashboard();
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('startBtn').innerText = 'เริ่มการทดสอบ 🚀';
-            });
-    }
+    // 1. โหลดข้อมูล
+    window.onload = () => {
+        fetch(GOOGLE_URL).then(res => res.json()).then(data => {
+            allStudents = data.names;
+            lastStatusMap = data.lastStatus;
+            populateDropdown();
+            updateDashboard();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn').innerText = 'เริ่มทดสอบ 🚀';
+        });
+    };
 
     function populateDropdown() {
         const select = document.getElementById('studentSelect');
-        select.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
-        allStudents.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.innerText = name + (lastStatusMap[name] ? ` (${lastStatusMap[name].level})` : " (ใหม่)");
-            select.appendChild(opt);
+        select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+        allStudents.forEach(n => {
+            let tag = lastStatusMap[n] ? ` [${lastStatusMap[name]?.level || 'ใหม่'}]` : " [ใหม่]";
+            select.innerHTML += `<option value="${n}">${n}${tag}</option>`;
         });
     }
 
-    function updateStudentProgress() {
-        const name = document.getElementById('studentSelect').value;
-        const hint = document.getElementById('progressHint');
-        if (lastStatusMap[name]) {
-            currentIndex = parseInt(lastStatusMap[name].wordIndex) + 1;
-            if (currentIndex >= wordList.length) currentIndex = 0; // ถ้าจบแล้วให้เริ่มใหม่
-            hint.innerText = `อ่านถึงล่าสุด: ${wordList[currentIndex].word} (ระดับ ${wordList[currentIndex].r})`;
-        } else {
-            currentIndex = 0;
-            hint.innerText = "ยังไม่เคยทดสอบ เริ่มจากคำแรก";
-        }
+    function updateProgressHint() {
+        let name = document.getElementById('studentSelect').value;
+        let hint = document.getElementById('progressHint');
+        if(lastStatusMap[name]) {
+            hint.innerText = `อ่านถึงล่าสุด: ${lastStatusMap[name].level}`;
+        } else { hint.innerText = "ยังไม่เคยประเมิน"; }
     }
 
-    function updateDashboard() {
-        let r1=0, r2=0, r35=0;
-        Object.values(lastStatusMap).forEach(v => {
-            if (v.level === "R1") r1++;
-            else if (v.level === "R2") r2++;
-            else r35++;
-        });
-        document.getElementById('countR1').innerText = r1;
-        document.getElementById('countR2').innerText = r2;
-        document.getElementById('countR3-5').innerText = r35;
+    // 2. ระบบสุ่มและเริ่มทดสอบ
+    function startTestSequence() {
+        currentStudent = document.getElementById('studentSelect').value;
+        currentRoom = document.getElementById('roomInput').value;
+        if(!currentStudent || !currentRoom) return alert("ข้อมูลไม่ครบ");
+
+        // กำหนดระดับเริ่มต้น (สมมติเริ่มจาก R1 หรือระดับที่ยังไม่ผ่าน)
+        currentR = lastStatusMap[currentStudent]?.level?.split(':')[0] || "R1";
+        setupLevel(currentR);
     }
 
-    // --- ฟังก์ชันการทดสอบ ---
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+    function setupLevel(rCode) {
+        currentR = rCode;
+        // กรองคำเฉพาะระดับ และสุ่ม (Randomize)
+        let filtered = rawData.filter(d => d.r === rCode);
+        currentLevelWords = filtered.sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+
+        showTutorial();
     }
 
-    function startApp() {
-        currentStudent = document.getElementById("studentSelect").value;
-        currentRoom = document.getElementById("roomInput").value;
-        if (!currentStudent || !currentRoom) return alert("กรุณาเลือกชื่อและระบุชั้นเรียน");
+    // 3. ระบบ Tutorial
+    function showTutorial() {
+        showScreen('tutorialScreen');
+        let sample = rawData.find(d => d.r === currentR);
+        document.getElementById('tutLevelBadge').innerText = `ระดับ ${currentR}`;
+        document.getElementById('tutInstruction').innerText = `คำสั่ง: ให้อ่านคำที่ปรากฏในระดับนี้ (มีทั้งหมด ${currentLevelWords.length} 10 คำ)`;
+        document.getElementById('tutWordDisplay').innerText = sample.word;
+        document.getElementById('tutReadingHint').innerText = `วิธีอ่าน: ${sample.sample}`;
         
-        document.getElementById("displayName").innerText = currentStudent;
-        document.getElementById("displayRoom").innerText = currentRoom;
-        updateDisplay();
-        showScreen('practiceScreen');
+        // แสดงมือชี้ปุ่ม
+        let hand = document.getElementById('handPointer');
+        hand.style.display = 'block';
+        hand.style.top = "80%"; hand.style.left = "45%";
     }
 
-    function updateDisplay() {
-        const item = wordList[currentIndex];
-        document.getElementById("wordDisplay").innerText = item.word;
-        document.getElementById("rLevelBadge").innerText = `${item.r}: ${item.desc}`;
-        document.getElementById("resultText").innerText = "กดปุ่มส้มแล้วอ่านออกเสียง";
-        document.getElementById("resultText").style.background = "#EDF2F7";
+    function playSampleAudio() {
+        let sample = rawData.find(d => d.r === currentR);
+        let msg = new SpeechSynthesisUtterance(`ตัวอย่างวิธีอ่านคำนี้คือ ${sample.sample}`);
+        msg.lang = 'th-TH';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function startActualLevel() {
+        document.getElementById('handPointer').style.display = 'none';
+        showScreen('practiceScreen');
+        updatePracticeDisplay();
+    }
+
+    // 4. ระบบ Feedback (Fireworks/Cross)
+    function showFeedback(isSuccess) {
+        let icon = isSuccess ? document.getElementById('fireworkIcon') : document.getElementById('crossIcon');
+        icon.style.display = 'block';
+        if(isSuccess) {
+            let msg = new SpeechSynthesisUtterance("เก่งมากค่ะ!");
+            msg.lang = 'th-TH'; window.speechSynthesis.speak(msg);
+        }
+        setTimeout(() => { icon.style.display = 'none'; }, 1000);
+    }
+
+    // 5. ระบบบันทึกผล
+    function updatePracticeDisplay() {
+        let item = currentLevelWords[currentIndex];
+        document.getElementById('displayName').innerText = `👤 ${currentStudent}`;
+        document.getElementById('displayLevelCount').innerText = `คำที่ ${currentIndex+1}/${currentLevelWords.length}`;
+        document.getElementById('rLevelBadge').innerText = `${item.r}: ${item.desc}`;
+        document.getElementById('wordDisplay').innerText = item.word;
+        document.getElementById('resultText').innerText = "พร้อมฟังแล้ว...";
+        
+        // ไอคอนวิธีอ่าน (Placeholder links)
+        document.getElementById('resourceBtnArea').innerHTML = `
+            <div class="resource-link" onclick="window.open('https://example.com/media/${item.r}')">📺 ดูสื่อการสอน ${item.r}</div>
+            <small style="display:block; color:#718096">คำแนะนำครู: ${item.advice}</small>
+        `;
     }
 
     function startListening() {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "th-TH";
-        document.getElementById("resultText").innerText = "🎤 กำลังฟัง...";
+        document.getElementById("resultText").innerText = "👂 กำลังฟัง...";
         recognition.start();
-        
-        recognition.onresult = function(event) {
-            const spoken = event.results[0][0].transcript;
-            if (spoken.includes(wordList[currentIndex].word)) {
-                handleSuccess(spoken);
-            } else {
-                document.getElementById("resultText").innerText = `❌ ยังไม่ชัด (ได้ยินว่า: ${spoken})`;
-                document.getElementById("resultText").style.background = "#FED7D7";
-            }
+        recognition.onresult = (e) => {
+            let spoken = e.results[0][0].transcript;
+            if(spoken.includes(currentLevelWords[currentIndex].word)) handleManualResult(true);
+            else document.getElementById("resultText").innerText = `❌ ได้ยินว่า: ${spoken}`;
         };
     }
 
-    function handleSuccess(spoken) {
-        saveData("ผ่าน", "ชัดเจน");
-        document.getElementById("resultText").innerText = "✅ ถูกต้อง!";
-        document.getElementById("resultText").style.background = "#C6F6D5";
-        
-        setTimeout(() => {
-            if (currentIndex < wordList.length - 1) {
-                currentIndex++;
-                updateDisplay();
-            } else {
-                alert("ยินดีด้วย! ทดสอบจนถึงคำสุดท้ายแล้ว");
-                backToMain();
-            }
-        }, 1500);
+    function handleManualResult(isPass) {
+        showFeedback(isPass);
+        if(isPass) {
+            saveToCloud("ผ่าน");
+            setTimeout(() => {
+                if(currentIndex < currentLevelWords.length - 1) {
+                    currentIndex++;
+                    updatePracticeDisplay();
+                } else {
+                    alert(`จบระดับ ${currentR} แล้ว!`);
+                    moveToNextR();
+                }
+            }, 1200);
+        } else {
+            saveToCloud("ติดขัด");
+            alert("บันทึกการติดขัดแล้ว ลองฝึกเพิ่มตามคำแนะนำนะคะ");
+            location.reload();
+        }
     }
 
-    function handleStruggle() {
-        const item = wordList[currentIndex];
-        const advice = item.advice;
-        alert(`ระดับ: ${item.r}\nข้อแนะนำ: ${advice}`);
-        saveData("ควรปรับปรุง", advice);
-        backToMain();
+    function moveToNextR() {
+        let rs = ["R1", "R2", "R3", "R4", "R5"];
+        let next = rs[rs.indexOf(currentR) + 1];
+        if(next) setupLevel(next);
+        else { alert("จบการประเมินทุกระดับแล้ว"); location.reload(); }
     }
 
-    function saveData(status, advice) {
-        const item = wordList[currentIndex];
-        const data = {
+    function saveToCloud(status) {
+        let item = currentLevelWords[currentIndex];
+        let data = {
             student: currentStudent,
-            room: currentRoom,
+            room: document.getElementById('roomInput').value,
             word: item.word,
-            rLevel: item.r,
+            rLevel: `${item.r}: ${item.desc}`,
             status: status,
             wordIndex: currentIndex,
-            advice: advice
+            advice: item.advice,
+            coaching: document.getElementById('coachingMethod').value,
+            referral: document.getElementById('referralFlag').checked ? "ใช่ (พบแพทย์)" : "ไม่"
         };
-        // อัปเดตในเครื่องทันที
-        lastStatusMap[currentStudent] = { level: item.r, wordIndex: currentIndex };
-        updateDashboard();
-        
         fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
-    function backToMain() {
-        // ล้างค่าตัวแปรเดิมเพื่อป้องกันข้อมูลค้าง
-        currentStudent = "";
-        currentIndex = 0;
-        document.getElementById("studentSelect").value = "";
-        document.getElementById("progressHint").innerText = "";
-        loadData(); // รีโหลดข้อมูลใหม่จาก Google Sheets
-        showScreen('setupScreen');
+    // Helper Functions
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function toggleCoachingForm() {
+        let panel = document.getElementById('coachingPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function updateDashboard() {
+        let r1=0, r2=0, other=0;
+        Object.values(lastStatusMap).forEach(v => {
+            if(v.level.includes("R1")) r1++;
+            else if(v.level.includes("R2")) r2++;
+            else other++;
+        });
+        document.getElementById('countR1').innerText = r1;
+        document.getElementById('countR2').innerText = r2;
+        document.getElementById('countOther').innerText = other;
     }
 
     function showSummary() {
         showScreen('reportPanel');
-        const holder = document.getElementById("statsTableHolder");
-        let html = `<table><tr><th>ชื่อนักเรียน</th><th>ระดับล่าสุด</th><th>สถานะ</th></tr>`;
-        allStudents.forEach(name => {
-            const last = lastStatusMap[name];
-            html += `<tr>
-                <td>${name}</td>
-                <td>${last ? last.level : "-"}</td>
-                <td>${last ? "ประเมินแล้ว" : "ยังไม่ได้ทดสอบ"}</td>
-            </tr>`;
+        let html = `<table><tr><th>ชื่อ</th><th>ระดับล่าสุด</th><th>นิเทศ/ส่งต่อ</th></tr>`;
+        allStudents.forEach(n => {
+            let last = lastStatusMap[n];
+            html += `<tr><td>${n}</td><td>${last?last.level:'-'}</td><td>${last? 'บันทึกแล้ว' : '-'}</td></tr>`;
         });
         html += `</table>`;
-        holder.innerHTML = html;
+        document.getElementById('statsTableHolder').innerHTML = html;
     }
 </script>
 
