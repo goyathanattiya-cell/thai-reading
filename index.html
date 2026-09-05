@@ -3,48 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEARING SCHOOL v3.1 - Clinical Edition</title>
+    <title>HEARING SCHOOL v3.2 - Complete Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4FD1C5; --secondary: #F6AD55; --accent: #B794F4; --success: #48BB78; --danger: #F56565; --bg: #F0FFF4; }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; position: relative; overflow: hidden; min-height: 550px; }
+        .container { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; position: relative; overflow: hidden; min-height: 550px; border: 5px solid white; }
         
         .screen { display: none; }
         .active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .feedback-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 150px; z-index: 100; display: none; pointer-events: none; }
-        .firework { color: #FFD700; text-shadow: 0 0 20px gold; }
-        .cross { color: var(--danger); }
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #E6FFFA; border: 2px solid var(--primary); padding: 10px; border-radius: 15px; }
+        .stat-num { font-size: 24px; font-weight: bold; color: var(--primary); }
 
+        .feedback-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 150px; z-index: 100; display: none; pointer-events: none; }
         .word-card { background: #F7FAFC; padding: 40px 10px; border-radius: 20px; margin: 15px 0; border: 3px dashed #CBD5E0; }
-        .btn { border: none; padding: 15px 25px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin: 5px 0; transition: 0.3s; font-family: 'Mitr'; }
+        .btn { border: none; padding: 15px 25px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin: 5px 0; transition: 0.3s; font-family: 'Mitr'; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-start { background: var(--primary); }
         .btn-speak { background: var(--secondary); font-size: 24px; }
-        .btn-medicine { background: var(--accent); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
+        .btn-report { background: var(--accent); }
+        
         select, input { width: 95%; padding: 12px; margin: 8px 0; border: 2px solid #E2E8F0; border-radius: 12px; font-size: 16px; }
         .badge { background: #E9D8FD; color: #6B46C1; padding: 5px 15px; border-radius: 50px; font-weight: bold; display: inline-block; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #EDF2F7; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Visual Feedback -->
-    <div id="fireworkIcon" class="feedback-overlay firework">🎆</div>
-    <div id="crossIcon" class="feedback-overlay cross">❌</div>
+    <div id="fireworkIcon" class="feedback-overlay">🎆</div>
+    <div id="crossIcon" class="feedback-overlay">❌</div>
 
-    <!-- หน้า 1: หน้าหลัก -->
+    <!-- หน้า 1: หน้าหลัก & Dashboard -->
     <div id="setupScreen" class="screen active">
         <h2>🏫 HEARING SCHOOL</h2>
-        <p style="color:#718096; margin-top:-10px;">โรงเรียนวัดหนองโพรง</p>
+        <div class="dashboard">
+            <div class="stat-card"><div class="stat-num" id="countR1">0</div><small>R1</small></div>
+            <div class="stat-card"><div class="stat-num" id="countR2">0</div><small>R2</small></div>
+            <div class="stat-card"><div class="stat-num" id="countR35">0</div><small>R3-5</small></div>
+        </div>
         
         <div style="text-align:left; padding:10px;">
             <label><b>1. เลือกนักเรียน:</b></label>
             <select id="studentSelect" onchange="updateProgressHint()">
-                <option value="">-- กำลังโหลด --</option>
+                <option value="">-- กำลังโหลดรายชื่อ --</option>
             </select>
             <div id="progressHint" style="font-size:12px; color:var(--primary); min-height:15px; margin-bottom:10px;"></div>
             
@@ -52,20 +59,21 @@
             <input type="text" id="roomInput" value="ป.1/1">
         </div>
 
-        <button class="btn btn-start" onclick="startTestSequence()" id="startBtn" disabled>รอข้อมูล... 🚀</button>
+        <button class="btn btn-start" onclick="startTestSequence()" id="startBtn" disabled>รอโหลดข้อมูล... 🚀</button>
+        <button class="btn btn-report" onclick="showSummary()">📊 รายงานและส่งออกข้อมูล</button>
     </div>
 
-    <!-- หน้า 2: หน้าแนะนำระดับ (Tutorial) - มีเสียงอัตโนมัติ -->
+    <!-- หน้า 2: โหมดตัวอย่าง -->
     <div id="tutorialScreen" class="screen">
         <div class="badge" id="tutLevelBadge">ระดับ R1</div>
         <h3>📝 คำชี้แจง</h3>
-        <p id="tutInstruction" style="color:#4A5568;">ให้อ่านคำที่ปรากฏทั้งหมด 10 คำให้ถูกต้อง</p>
+        <p style="color:#4A5568;">ให้อ่านคำที่ปรากฏทั้งหมด 10 คำให้ถูกต้อง</p>
         <div class="word-card">
             <small>ตัวอย่างวิธีการอ่าน:</small>
             <h1 id="tutWordDisplay" style="font-size:80px; margin:10px 0;">ก</h1>
             <p id="tutReadingHint" style="color:var(--accent); font-weight:bold;"></p>
         </div>
-        <p style="color:var(--secondary);">🚀 กำลังเริ่มการทดสอบใน 5 วินาที...</p>
+        <p style="color:var(--secondary); font-weight:bold;">🚀 กำลังเริ่มการทดสอบใน 5 วินาที...</p>
     </div>
 
     <!-- หน้า 3: หน้าทดสอบจริง -->
@@ -76,7 +84,7 @@
         </div>
         <div id="rLevelBadge" class="badge"></div>
         <div class="word-card">
-            <h1 id="wordDisplay" style="font-size:100px; margin:0;">?</h1>
+            <h1 id="wordDisplay" style="font-size:90px; margin:0;">?</h1>
         </div>
         <div id="resultText" style="margin:10px 0; font-weight:bold; color:#718096;">คลิกปุ่มไมค์แล้วเริ่มอ่าน</div>
         <button class="btn btn-speak" onclick="startListening()">🎤 คลิกเพื่ออ่าน</button>
@@ -86,7 +94,7 @@
         </div>
     </div>
 
-    <!-- หน้า 4: หน้าซ่อมเสริม (ยารักษา) -->
+    <!-- หน้า 4: หน้าซ่อมเสริม -->
     <div id="medicineScreen" class="screen">
         <div style="font-size:60px;">💊</div>
         <h3>คลินิกการพัฒนาการอ่าน</h3>
@@ -95,90 +103,102 @@
             <b>📋 วิธีการรักษา/ฝึกฝน:</b>
             <p id="medicineAdvice" style="font-size:14px;"></p>
         </div>
-        <button class="btn btn-medicine" id="driveLinkBtn" onclick="openMedicineDrive()">📺 กดเพื่อรับสื่อการสอน (ยารักษา)</button>
-        <button class="btn" style="background:#4A5568; margin-top:20px;" onclick="location.reload()">🏠 กลับหน้าหลัก (คนถัดไป)</button>
+        <button class="btn btn-start" style="background:var(--accent)" id="driveLinkBtn" onclick="openMedicineDrive()">📺 รับสื่อการสอน (ยารักษา)</button>
+        <button class="btn" style="background:#4A5568; margin-top:20px;" onclick="location.reload()">🏠 กลับหน้าหลัก (เปลี่ยนคน)</button>
+    </div>
+
+    <!-- หน้า 5: รายงานสรุป -->
+    <div id="reportPanel" class="screen">
+        <h3>📊 สรุปผลการอ่าน</h3>
+        <button class="btn" style="background:#38A169" onclick="exportToCSV()">📥 ส่งออกไฟล์ CSV (Excel)</button>
+        <div id="statsTableHolder" style="max-height: 400px; overflow-y: auto;"></div>
+        <button class="btn btn-start" onclick="showScreen('setupScreen')">🏠 กลับหน้าหลัก</button>
     </div>
 </div>
 
 <script>
-    // *** นำ URL แอปเว็บของคุณมาใส่ที่นี่ ***
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbw-VFfIMUpllKg8m3iA2-GYFfdqCJcgOWjhLEZArD_SehcADLNBCysN4B-iXA1ZHeiIXg/exec";
+    // *** สำคัญ: นำ URL ที่ได้จากขั้นตอน Deploy มาใส่ที่นี่ ***
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzBHT2_Gt_oJc3c1GP7S_L5w5WSzhQX6ycmJbi5jbU04D-tDcaTlPlH-JVLZdutWGkB/exec";
 
-    // คลังคำศัพท์ (คุณครูสามารถเพิ่มคำให้ครบ 10 คำต่อระดับได้ที่นี่)
     const wordBank = [
         { word: "ก", r: "R1", sample: "กอ-ไก่", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "ค", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "ต", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "ฒ", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "ฬ", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "อี", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "แอะ", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "เอือ", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "เอาะ", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
-        { word: "เอีย", r: "R1", drive: " https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing ", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "ค", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "ต", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "ฒ", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "ฬ", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "อี", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "แอะ", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "เอือ", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "เอาะ", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
+        { word: "เอีย", r: "R1", drive: "https://drive.google.com/drive/folders/1wszaHWdF_WxGK3S4VWMNtIbuMOLnxqQG?usp=sharing", advice: "R1: ใช้เพลงสระ/พยัญชนะ และแบบฝึกสื่อสี" },
         
-        { word: "จะ", r: "R2", sample: "จอ-อะ-จะ", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ปะ", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ขา", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "มา", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ดุ", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ปู", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ฟู", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "ไป", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "มือ", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
-        { word: "เละ", r: "R2", drive: " https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing ", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ กลับมาชี้ที่พยัญชนะตัวแรก" },
+        { word: "จะ", r: "R2", sample: "จอ-อะ-จะ", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ปะ", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ขา", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "มา", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ดุ", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ปู", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ฟู", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "ไป", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "มือ", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
+        { word: "เละ", r: "R2", drive: "https://drive.google.com/drive/folders/13DqSkUEOE18J8krAUYNwcOy6I5MsSKbu?usp=sharing", advice: "R2: สอนชี้มือที่ตัวหนังสือที่ออกเสียง และแจกลูกสะกดคำ" },
         
-        { word: "กล้า", r: "R3", sample: "กอ-ลอ-อา-กลา-ไม้โท-กล้า", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำพยัญชนะต้น เปลี่ยนสระ และเพิ่มเสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "ครัว", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำพยัญชนะต้น เปลี่ยนสระ และเพิ่มเสียงวรรณยุกต์  ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "เพลีย", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำพยัญชนะต้น เปลี่ยนสระ และเพิ่มเสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "ปลูก", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำพยัญชนะต้น เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "กว้าง", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำ พยัญชนะต้น เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "จริง", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำไม่แท้ พยัญชนะต้นอ่านเสียงเดี่ยว เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "ทราบ", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำควบกล้ำไม่แท้ พยัญชนะต้นเปลี่ยนเสียง เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นทุกครั้ง" },
-        { word: "หมอน", r: "R3", sample: "หอ-มอ-ออ-นอ-หมอน", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำอักษรนำพยัญชนะต้นเปลี่ยนเสียง เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นตัวหลังทุกครั้ง" }
-        { word: "หยุด", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำอักษรนำพยัญชนะต้นเปลี่ยนเสียง เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นตัวหลังทุกครั้ง" }
-        { word: "อย่า", r: "R3", drive: " https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing ", advice: "R3: วิธีอ่านเน้นคำอักษรนำพยัญชนะต้นเปลี่ยนเสียง เปลี่ยนสระ และเพิ่มเสียงตัวสะกด เสียงวรรณยุกต์ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นตัวหลังทุกครั้ง" }
+        { word: "กล้า", r: "R3", sample: "กอ-ลอ-อา-กลา-ไม้โท-กล้า", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "ครัว", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "เพลีย", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "ปลูก", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "กว้าง", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "จริง", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "ทราบ", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นคำควบกล้ำ ชี้มือตามตัวอักษรแล้วกลับมาชี้พยัญชนะต้น" },
+        { word: "หมอน", r: "R3", sample: "หอ-มอ-ออ-นอ-หมอน", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นอักษรนำ ชี้มือตามตัวอักษร" },
+        { word: "หยุด", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นอักษรนำ ชี้มือตามตัวอักษร" },
+        { word: "อย่า", r: "R3", drive: "https://drive.google.com/drive/folders/1aLddxbzkNW9uUthZACnQIe4-CTgfByD4?usp=sharing", advice: "R3: เน้นอักษรนำ ชี้มือตามตัวอักษร" },
 
-        { word: "ครอบครัว", r: "R4", sample: "ครอบ-ครัว", drive: "ลิ้งค์_Drive_R4", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นคงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "กากี", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นคงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "ดีเดย์", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นคงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "กีฬา", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "ประกาศ", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "นิสัย", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "สวนครัว", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "สวนครัว", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "สวนครัว", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
-        { word: "โจ๊กหมู", r: "R4", drive: " https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing ", advice: "R4: วิธีอ่านคำต่อเนื่อง พยัญชนะต้นไม่คงที่ เปลี่ยนสระ ชี้มือตามตัวอักษร แล้วกลับมาชี้ที่พยัญชนะต้นคำนั้นทุกครั้ง" },
+        { word: "กากี", r: "R4", drive: "https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing", advice: "R4: ฝึกอ่านคำต่อเนื่อง" },
+        { word: "ดีเดย์", r: "R4", drive: "https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing", advice: "R4: ฝึกอ่านคำต่อเนื่อง" },
+        { word: "กีฬา", r: "R4", drive: "https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing", advice: "R4: ฝึกอ่านคำต่อเนื่อง" },
+        { word: "ประกาศ", r: "R4", drive: "https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing", advice: "R4: ฝึกอ่านคำต่อเนื่อง" },
+        { word: "นิสัย", r: "R4", drive: "https://drive.google.com/drive/folders/1-IU9lmRTN1AN1pTIJjhpAJW9wrMaRK7u?usp=sharing", advice: "R4: ฝึกอ่านคำต่อเนื่อง" },
 
-        { word: "หนามแหลมคม", r: "R5", sample: "หนาม-แหลม-คม", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "อ่อนเปลี้ยหมดแรง", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "หนูอยากไปโรงเรียน", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "วารีไปดูกีฬาที่สนาม", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "เช้าวันนี้ฉันเห็นรุ้งกินน้ำบนท้องฟ้า", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "หมอรักษาผู้ป่วยยากจนในชุมชนแออัด", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "กระต่ายกินผักบุ้งในไร่ริมชายทุ่ง", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "พวกเราเป็นชาวเขาเผ่าหนึ่ง", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "เรารักพระองค์มาก", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
-        { word: "ห้ามส่งเสียงดัง", r: "R5", drive: " https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing ", advice: "R5: วิธีอ่านคำต่อเนื่องหลายคำ ชี้มือตามพยัญชนะต้นคำนั้นทุกคำ" },
+        { word: "หนูอยากไปโรงเรียน", r: "R5", drive: "https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing", advice: "R5: ฝึกอ่านประโยค" },
+        { word: "วารีไปดูกีฬาที่สนาม", r: "R5", drive: "https://drive.google.com/drive/folders/1BImvrjS70q3zommAYTSTMq4xJhaWYPJH?usp=sharing", advice: "R5: ฝึกอ่านประโยค" }
     ];
 
-    let allStudents = [], lastStatusMap = {}, currentStudent = "", currentRoom = "";
+    let allStudents = [], lastStatusMap = {}, allHistory = [];
     let testWords = [], currentIndex = 0, currentR = "", medicineLink = "";
 
     window.onload = () => {
         fetch(GOOGLE_URL).then(res => res.json()).then(data => {
             allStudents = data.names;
             lastStatusMap = data.lastStatus;
-            const select = document.getElementById('studentSelect');
-            select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
-            allStudents.forEach(n => {
-                let info = lastStatusMap[n] ? ` [${lastStatusMap[n].level}]` : " [ใหม่]";
-                select.innerHTML += `<option value="${n}">${n}${info}</option>`;
-            });
+            allHistory = data.allHistory;
+            populateDropdown();
+            updateDashboard();
             document.getElementById('startBtn').disabled = false;
             document.getElementById('startBtn').innerText = 'เริ่มทดสอบ 🚀';
-        });
+        }).catch(e => alert("เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e));
     };
+
+    function populateDropdown() {
+        const select = document.getElementById('studentSelect');
+        select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+        allStudents.forEach(n => {
+            let info = lastStatusMap[n] ? ` [${lastStatusMap[n].level}]` : " [ใหม่]";
+            select.innerHTML += `<option value="${n}">${n}${info}</option>`;
+        });
+    }
+
+    function updateDashboard() {
+        let r1 = 0, r2 = 0, r35 = 0;
+        Object.values(lastStatusMap).forEach(v => {
+            if (v.level == "R1") r1++;
+            else if (v.level == "R2") r2++;
+            else r35++;
+        });
+        document.getElementById('countR1').innerText = r1;
+        document.getElementById('countR2').innerText = r2;
+        document.getElementById('countR35').innerText = r35;
+    }
 
     function updateProgressHint() {
         let name = document.getElementById('studentSelect').value;
@@ -187,11 +207,13 @@
     }
 
     function startTestSequence() {
-        currentStudent = document.getElementById('studentSelect').value;
-        currentRoom = document.getElementById('roomInput').value;
-        if(!currentStudent) return alert("เลือกชื่อนักเรียนก่อนครับ");
+        let name = document.getElementById('studentSelect').value;
+        let room = document.getElementById('roomInput').value;
+        if(!name) return alert("เลือกชื่อนักเรียนก่อนครับ");
         
-        currentR = lastStatusMap[currentStudent] ? lastStatusMap[currentStudent].level : "R1";
+        currentStudent = name;
+        currentRoom = room;
+        currentR = lastStatusMap[name] ? lastStatusMap[name].level : "R1";
         setupLevel(currentR);
     }
 
@@ -200,7 +222,6 @@
         let pool = wordBank.filter(d => d.r === rCode);
         if(pool.length === 0) { alert("จบการประเมินทุกระดับ"); location.reload(); return; }
         
-        // สุ่มคำ 10 คำ (หรือเท่าที่มีถ้าไม่ถึง 10)
         testWords = pool.sort(() => Math.random() - 0.5).slice(0, 10);
         currentIndex = 0;
         showTutorial();
@@ -208,13 +229,12 @@
 
     function showTutorial() {
         showScreen('tutorialScreen');
-        let sample = wordBank.find(d => d.r === currentR);
+        let sample = wordBank.find(d => d.r === currentR) || wordBank[0];
         document.getElementById('tutLevelBadge').innerText = `ระดับ ${currentR}`;
         document.getElementById('tutWordDisplay').innerText = sample.word;
-        document.getElementById('tutReadingHint').innerText = `วิธีอ่าน: ${sample.sample}`;
+        document.getElementById('tutReadingHint').innerText = `วิธีอ่าน: ${sample.sample || '-'}`;
         
-        // เสียงอ่านอัตโนมัติ (ครั้งเดียว)
-        let msg = new SpeechSynthesisUtterance(`ยินดีต้อนรับสู่ระดับ ${currentR} วิธีอ่านคำตัวอย่างคือ ${sample.sample} เตรียมตัวเริ่มทดสอบจริงนะคะ`);
+        let msg = new SpeechSynthesisUtterance(`ยินดีต้อนรับสู่ระดับ ${currentR} วิธีอ่านคำตัวอย่างคือ ${sample.sample || sample.word} เตรียมตัวเริ่มทดสอบจริงนะคะ`);
         msg.lang = 'th-TH'; window.speechSynthesis.speak(msg);
 
         setTimeout(startActualTest, 6000);
@@ -235,7 +255,7 @@
     }
 
     function startListening() {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
         recognition.lang = "th-TH";
         document.getElementById("resultText").innerText = "👂 กำลังฟัง...";
         recognition.start();
@@ -260,7 +280,7 @@
                 if(currentIndex < testWords.length - 1) {
                     currentIndex++; updatePracticeDisplay();
                 } else {
-                    alert("ยอดเยี่ยม! ผ่านครบ 10 คำแล้ว");
+                    alert("ยอดเยี่ยม! ผ่านครบระดับแล้ว");
                     moveToNextR();
                 }
             } else {
@@ -275,12 +295,12 @@
         showScreen('medicineScreen');
         document.getElementById('failReason').innerText = `ติดขัดที่ระดับ ${currentR}: ${item.word}`;
         document.getElementById('medicineAdvice').innerText = item.advice;
-        medicineLink = item.drive; // เก็บลิงก์ Drive ไว้กดเปิด
+        medicineLink = item.drive;
     }
 
     function openMedicineDrive() {
         if(medicineLink.includes("http")) window.open(medicineLink, '_blank');
-        else alert("ยังไม่ได้ใส่ลิงก์ Google Drive ในฐานข้อมูล");
+        else alert("ยังไม่ได้ใส่ลิงก์ Drive");
     }
 
     function moveToNextR() {
@@ -294,7 +314,7 @@
         let data = {
             student: currentStudent, room: currentRoom, word: item.word,
             rLevel: currentR, status: status, wordIndex: currentIndex,
-            advice: item.advice, coaching: "-", referral: "-"
+            advice: item.advice
         };
         fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
@@ -302,6 +322,28 @@
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+    }
+
+    function showSummary() {
+        showScreen('reportPanel');
+        let html = `<table><tr><th>วันที่</th><th>ชื่อ</th><th>ระดับ</th><th>คำ</th><th>ผล</th></tr>`;
+        allHistory.slice().reverse().forEach(h => {
+            html += `<tr><td>${new Date(h.time).toLocaleDateString()}</td><td>${h.name}</td><td>${h.level}</td><td>${h.word}</td><td>${h.status}</td></tr>`;
+        });
+        html += `</table>`;
+        document.getElementById('statsTableHolder').innerHTML = html;
+    }
+
+    function exportToCSV() {
+        let csv = "\ufeffวัน-เวลา,ชื่อ,ชั้น,ระดับ,คำ,สถานะ\n";
+        allHistory.forEach(h => {
+            csv += `${h.time},${h.name},${h.room},${h.level},${h.word},${h.status}\n`;
+        });
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "รายงานการอ่าน.csv";
+        link.click();
     }
 </script>
 </body>
